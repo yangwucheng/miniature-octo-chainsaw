@@ -1,5 +1,6 @@
-from allcoin.market import AllCoinMarket
 import configparser
+
+from allcoin.market import AllCoinMarket
 
 config = configparser.ConfigParser()
 config.read('config.ini')

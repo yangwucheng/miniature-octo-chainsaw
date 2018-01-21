@@ -24,7 +24,7 @@ class ExxTrade(object):
     def get_fund_balance(self, assets):
         # type: (list) -> dict
         balance = self.get_balance()
-        fund_balances ={}
+        fund_balances = {}
         for asset in assets:
             fund_balances[asset] = balance['funds'][asset]['balance']
         return fund_balances
@@ -75,7 +75,7 @@ class ExxTrade(object):
     def cancel_orders(self, open_orders):
         for open_order in open_orders:
             if 'id' in open_order:
-                print('cancel order', open_order )
+                print('cancel order', open_order)
                 self.cancel_order(open_order['currency'], open_order['id'])
 
     def cancel_all_orders(self, currency):
@@ -86,10 +86,12 @@ class ExxTrade(object):
         self.cancel_orders(open_orders)
 
     WITHDRAW_FEES = {
-        'qtum': {'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00, 'min_amount': 0.0000001},
+        'qtum': {'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
+                 'min_amount': 0.0000001},
         'btc': {'fee_ratio': 0.001, 'min_fee': 0.0000001, 'daily_quota': 10, 'each_quota': 3, 'min_amount': 0.0000001}
     }
-    DEFAULT_WITHDRAW_FEE = {'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00, 'min_amount': 0.0000001}
+    DEFAULT_WITHDRAW_FEE = {'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
+                            'min_amount': 0.0000001}
 
     @staticmethod
     def withdraw_fee(coin, amount):

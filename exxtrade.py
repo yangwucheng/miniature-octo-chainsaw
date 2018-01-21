@@ -2,8 +2,9 @@
 exx trade tester
 """
 
-from exx.trade import ExxTrade
 import configparser
+
+from exx.trade import ExxTrade
 
 config = configparser.ConfigParser()
 config.read(['config.ini', 'secret_config.ini'])

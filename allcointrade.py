@@ -2,13 +2,11 @@ import configparser
 
 from allcoin.trade import AllCoinTrade
 
-
 config = configparser.ConfigParser()
 config.read(['config.ini', 'secret_config.ini'])
 all_coin_trade_url = config['allcoin']['trade_url']
 all_coin_api_key = config['allcoin']['api_key']
 all_coin_secret_key = config['allcoin']['secret_key']
-
 
 all_coin_trade = AllCoinTrade(all_coin_trade_url, all_coin_api_key, all_coin_secret_key)
 

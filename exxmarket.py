@@ -1,8 +1,9 @@
 """
 exx market data tester
 """
-from exx.market import ExxMarket
 import configparser
+
+from exx.market import ExxMarket
 
 config = configparser.ConfigParser()
 config.read('config.ini')

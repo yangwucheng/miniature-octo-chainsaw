@@ -27,7 +27,8 @@ class AllCoinTrade(object):
 
     def order(self, order_type, symbol, price, amount):
         # type: (str, str, float, float) -> str
-        params = {'api_key': self.__api_key, 'symbol': symbol, 'type': order_type, 'price': str(price), 'amount': str(amount)}
+        params = {'api_key': self.__api_key, 'symbol': symbol, 'type': order_type, 'price': str(price),
+                  'amount': str(amount)}
         params['sign'] = build_all_coin_sign(params, self.__secret_key)
         result = http_post(self.__url + AllCoinTrade.ORDER_RESOURCE, params)
         if result['result']:
@@ -57,7 +58,7 @@ class AllCoinTrade(object):
     def cancel_orders(self, open_orders):
         for open_order in open_orders:
             if 'order_id' in open_order:
-                print('cancel order', open_order )
+                print('cancel order', open_order)
                 self.cancel_order(open_order['symbol'], open_order['order_id'])
 
     def cancel_all_orders(self, symbol):
@@ -86,9 +87,11 @@ class AllCoinTrade(object):
         return fee
 
     TRADE_FEES = {
-        'spc_qtum': {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.000800, 'max_price': 0.800000, 'min_quantity': 2.00}
+        'spc_qtum': {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.000800, 'max_price': 0.800000,
+                     'min_quantity': 2.00}
     }
-    DEFAULT_TRADE_FEE = {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.000800, 'max_price': 0.800000, 'min_quantity': 2.00}
+    DEFAULT_TRADE_FEE = {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.000800, 'max_price': 0.800000,
+                         'min_quantity': 2.00}
 
     @staticmethod
     def buy_fee(symbol, amount, price):
@@ -118,4 +121,5 @@ class AllCoinTrade(object):
         else:
             trade_fee = AllCoinTrade.DEFAULT_TRADE_FEE
 
-        return price >= trade_fee['min_price'] and price <= trade_fee['max_price'] and amount >= trade_fee['min_quantity']
+        return price >= trade_fee['min_price'] and price <= trade_fee['max_price'] and amount >= trade_fee[
+            'min_quantity']
