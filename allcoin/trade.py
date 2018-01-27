@@ -15,7 +15,7 @@ class AllCoinTrade(object):
     def get_balance(self):
         params = {'api_key': self.__api_key}
         params['sign'] = build_all_coin_sign(params, self.__secret_key)
-        return http_post(self.__url + AllCoinTrade.BALANCE_RESOURCE, params)
+        return http_post(self.__url + AllCoinTrade.BALANCE_RESOURCE, params, verify=False)
 
     def get_fund_free(self, assets):
         # type: (list) -> dict
@@ -30,7 +30,7 @@ class AllCoinTrade(object):
         params = {'api_key': self.__api_key, 'symbol': symbol, 'type': order_type, 'price': str(price),
                   'amount': str(amount)}
         params['sign'] = build_all_coin_sign(params, self.__secret_key)
-        result = http_post(self.__url + AllCoinTrade.ORDER_RESOURCE, params)
+        result = http_post(self.__url + AllCoinTrade.ORDER_RESOURCE, params, verify=False)
         if result['result']:
             return result['order_id']
         print(result)
@@ -45,7 +45,7 @@ class AllCoinTrade(object):
     def cancel_order(self, symbol, order_id):
         params = {'api_key': self.__api_key, 'symbol': symbol, 'order_id': str(order_id)}
         params['sign'] = build_all_coin_sign(params, self.__secret_key)
-        result = http_post(self.__url + AllCoinTrade.CANCEL_RESOURCE, params)
+        result = http_post(self.__url + AllCoinTrade.CANCEL_RESOURCE, params, verify=False)
         if 'result' in result:
             return result['result']
         return result
@@ -53,7 +53,7 @@ class AllCoinTrade(object):
     def get_open_orders(self, symbol):
         params = {'api_key': self.__api_key, 'symbol': symbol, 'status': '0', 'current_page': 1, 'page_length': 200}
         params['sign'] = build_all_coin_sign(params, self.__secret_key)
-        return http_post(self.__url + AllCoinTrade.OPEN_ORDERS_RESOURCE, params)
+        return http_post(self.__url + AllCoinTrade.OPEN_ORDERS_RESOURCE, params, verify=False)
 
     def cancel_orders(self, open_orders):
         for open_order in open_orders:
@@ -67,7 +67,8 @@ class AllCoinTrade(object):
 
     WITHDRAW_FEES = {
         'qtum': {'fee_ratio': 0.002, 'min_fee': 0.002, 'daily_quota': 1000.00, 'min_amount': 0.2},
-        'btc': {'fee_ratio': 0.002, 'min_fee': 0.0015, 'daily_quota': 50.00, 'min_amount': 0.01}
+        'btc': {'fee_ratio': 0.002, 'min_fee': 0.0015, 'daily_quota': 50.00, 'min_amount': 0.01},
+        'oc': {'fee_ratio': 0.002, 'min_fee': 320, 'daily_quota': 4000000.00, 'min_amount': 800.00}
     }
     DEFAULT_WITHDRAW_FEE = {'fee_ratio': 0.002, 'min_fee': 0.002, 'daily_quota': 1000.00, 'min_amount': 0.2}
 
@@ -88,7 +89,9 @@ class AllCoinTrade(object):
 
     TRADE_FEES = {
         'spc_qtum': {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.000800, 'max_price': 0.800000,
-                     'min_quantity': 2.00}
+                     'min_quantity': 2.00},
+        'oc_btc': {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.00000021 , 'max_price': 0.00021400,
+                     'min_quantity': 40.00}
     }
     DEFAULT_TRADE_FEE = {'buy_fee_ratio': 0.0, 'sell_fee_ratio': 0.002, 'min_price': 0.000800, 'max_price': 0.800000,
                          'min_quantity': 2.00}

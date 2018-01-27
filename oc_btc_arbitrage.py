@@ -1,8 +1,8 @@
 import configparser
 from allcoin.market import AllCoinMarket
 from allcoin.trade import AllCoinTrade
-from exx.market import ExxMarket
-from exx.trade import ExxTrade
+from bitz.market import BitZMarket
+from bitz.trade import BitZTrade
 
 
 def calculate_pnl(buy_price, sell_price, amount, buy_fee, sell_fee, buy_withdraw_fee, sell_withdraw_fee):
@@ -21,34 +21,29 @@ if __name__ == '__main__':
     all_coin_secret_key = config['allcoin']['secret_key']
     all_coin_trade = AllCoinTrade(all_coin_trade_url, all_coin_api_key, all_coin_secret_key)
 
-    exx_market_url = config['exx']['market_url']
-    exx_market = ExxMarket(exx_market_url)
+    bit_z_market_url = config['bitz']['market_url']
+    bit_z_market = BitZMarket(bit_z_market_url)
 
-    exx_trade_url = config['exx']['trade_url']
-    exx_access_key = config['exx']['access_key']
-    exx_secret_key = config['exx']['secret_key']
-    exx_trade = ExxTrade(exx_trade_url, exx_access_key, exx_secret_key)
+    all_coin_asks = all_coin_market.oc_btc_asks()
+    all_coin_ask_1_price = float(all_coin_asks[0][0])
+    all_coin_ask_1_volume = float(all_coin_asks[0][1])
 
-    exx_asks = exx_market.spc_qtum_asks()
-    exx_ask_1_price = float(exx_asks[-1][0])
-    exx_ask_1_volume = float(exx_asks[-1][1])
+    bit_z_bids = bit_z_market.oc_btc_bids()
+    bit_z_bid_1_price = float(bit_z_bids[0][0])
+    bit_z_bid_1_volume = float(bit_z_bids[0][1])
 
-    all_coin_bids = all_coin_market.spc_qtum_bids()
-    all_coin_bid_1_price = float(all_coin_bids[0][0])
-    all_coin_bid_1_volume = float(all_coin_bids[0][1])
+    sell_price = bit_z_bid_1_price
+    buy_price = all_coin_ask_1_price
+    amount = bit_z_bid_1_volume
+    if amount > all_coin_ask_1_volume:
+        amount = all_coin_ask_1_volume
 
-    sell_price = all_coin_bid_1_price
-    buy_price = exx_ask_1_price
-    amount = all_coin_bid_1_volume
-    if amount > exx_ask_1_volume:
-        amount = exx_ask_1_volume
-
-    symbol = 'spc_qtum'
-    if ExxTrade.is_valid_order(symbol, amount, buy_price) and AllCoinTrade.is_valid_order(symbol, amount, sell_price):
-        buy_fee = ExxTrade.buy_fee(symbol, amount, buy_price)
-        sell_fee = AllCoinTrade.sell_fee(symbol, amount, sell_price)
-        buy_withdraw_fee = ExxTrade.withdraw_fee('spc', amount) * buy_price
-        sell_withdraw_fee = AllCoinTrade.withdraw_fee('qtum', amount * sell_price)
+    symbol = 'oc_btc'
+    if AllCoinTrade.is_valid_order(symbol, amount, buy_price) and BitZTrade.is_valid_order(symbol, amount, sell_price):
+        buy_fee = AllCoinTrade.buy_fee(symbol, amount, buy_price)
+        sell_fee = BitZTrade.sell_fee(symbol, amount, sell_price)
+        buy_withdraw_fee = AllCoinTrade.withdraw_fee('oc', amount) * buy_price
+        sell_withdraw_fee = BitZTrade.withdraw_fee('btc', amount * sell_price)
         pnl = calculate_pnl(buy_price, sell_price, amount, buy_fee, sell_fee, buy_withdraw_fee, sell_withdraw_fee)
         if pnl > 0:
             print('ARB')

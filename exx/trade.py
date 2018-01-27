@@ -86,11 +86,13 @@ class ExxTrade(object):
         self.cancel_orders(open_orders)
 
     WITHDRAW_FEES = {
-        'qtum': {'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
+        'qtum': {'fee_type': 'float', 'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
                  'min_amount': 0.0000001},
-        'btc': {'fee_ratio': 0.001, 'min_fee': 0.0000001, 'daily_quota': 10, 'each_quota': 3, 'min_amount': 0.0000001}
+        'btc': {'fee_type': 'float', 'fee_ratio': 0.001, 'min_fee': 0.0000001, 'daily_quota': 10, 'each_quota': 3, 'min_amount': 0.0000001},
+        'spc': {'fee_type': 'fixed', 'fee_ratio': 20.0, 'min_fee': 20, 'daily_quota': 1000000, 'each_quota': 100000,
+                'min_amount': 100}
     }
-    DEFAULT_WITHDRAW_FEE = {'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
+    DEFAULT_WITHDRAW_FEE = {'fee_type': 'float', 'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
                             'min_amount': 0.0000001}
 
     @staticmethod
@@ -102,9 +104,12 @@ class ExxTrade(object):
         else:
             withdraw_fee = ExxTrade.DEFAULT_WITHDRAW_FEE
 
-        fee = amount * withdraw_fee['fee_ratio']
-        if fee < withdraw_fee['min_fee']:
-            fee = withdraw_fee['min_fee']
+        if withdraw_fee['fee_type'] == 'float':
+            fee = amount * withdraw_fee['fee_ratio']
+            if fee < withdraw_fee['min_fee']:
+                fee = withdraw_fee['min_fee']
+        else:
+            fee = withdraw_fee['fee_ratio']
 
         return fee
 

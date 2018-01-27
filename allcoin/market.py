@@ -28,3 +28,17 @@ class AllCoinMarket(object):
             ]
         """
         return self.depth('spc_qtum')['bids']
+
+    def oc_btc_asks(self):
+        # type: () -> list
+        """
+
+        :return:
+            [
+                # [ask_price, ack_volume]
+                [0.0109, 7690.0], # ask_1
+		        [0.011, 9590.0], # ask_2
+		        [0.01112, 147.0] # ask_3
+            ]
+        """
+        return self.depth('oc_btc')['asks']
