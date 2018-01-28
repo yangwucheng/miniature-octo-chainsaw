@@ -10,26 +10,26 @@ all_coin_secret_key = config['allcoin']['secret_key']
 
 all_coin_trade = AllCoinTrade(all_coin_trade_url, all_coin_api_key, all_coin_secret_key)
 
-print('### spc qtum balance ###')
-print(all_coin_trade.get_fund_free(['spc', 'qtum']))
+print('### oc btc balance ###')
+print(all_coin_trade.get_fund_free(['oc', 'btc']))
 print()
 
-print('### buy 2 spc_qtum at 0.00001 ###')
-print(all_coin_trade.buy('spc_qtum', 0.00001, 2.0))
+print('### buy 100 oc_btc at 0.00000021  ###')
+print(all_coin_trade.buy('oc_btc', '0.00000021', '100.00'))
 print()
 
-print('### sell 2 spc_qtum at 0.8 ###')
-print(all_coin_trade.sell('spc_qtum', 0.8, 2.0))
+print('### sell 100 oc_btc at 0.00021400  ###')
+print(all_coin_trade.sell('oc_btc', '0.00021400', '100.00'))
 print()
 
-print('### get spc_qtum open orders ###')
-print(all_coin_trade.get_open_orders('spc_qtum'))
+print('### get oc_btc open orders ###')
+print(all_coin_trade.get_open_orders('oc_btc'))
 print()
 
-# print('### cancel spc_qtum order 58667713 ###')
-# print(all_coin_trade.cancel_order('scp_qtum', '58667713'))
-# print()
+print('### cancel oc_btc order 59770120 ###')
+print(all_coin_trade.cancel_order('oc_btc', '59770120'))
+print()
 
-print('### cancel all spc_qtum orders ###')
-print(all_coin_trade.cancel_all_orders('spc_qtum'))
+print('### cancel all oc_btc orders ###')
+print(all_coin_trade.cancel_all_orders('oc_btc'))
 print()

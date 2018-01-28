@@ -22,11 +22,11 @@ print(exx_trade.get_spc_qtum_balance())
 print()
 
 print('### buy spc_qtum 0.000001 1 ###')
-print(exx_trade.buy('spc_qtum', 0.000001, 1))
+print(exx_trade.buy('spc_qtum', '0.000001', '1'))
 print()
 
 print('### sell spc_qtum 1.0 1 ###')
-print(exx_trade.sell('spc_qtum', 1.0, 1))
+print(exx_trade.sell('spc_qtum', '1.0', '1'))
 print()
 
 print('### get spc_qtum buy open orders ###')

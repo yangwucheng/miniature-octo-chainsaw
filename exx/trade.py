@@ -10,6 +10,7 @@ class ExxTrade(object):
     CANCEL_RESOURCE = '/api/cancel'
 
     def __init__(self, url, access_key, secret_key):
+        # type: (str, str, str) -> None
         self.__url = url
         self.__access_key = access_key
         self.__secret_key = secret_key
@@ -33,13 +34,14 @@ class ExxTrade(object):
         return self.get_fund_balance(['SPC', 'QTUM'])
 
     def order(self, order_type, currency, price, amount):
-        # type: (str, str, float, float) -> str
-        params = {'accesskey': self.__access_key, 'amount': str(amount), 'currency': currency,
-                  'nonce': str(int(time.time() * 1000)), 'price': str(price), 'type': order_type}
+        # type: (str, str, str, str) -> str
+        params = {'accesskey': self.__access_key, 'amount': amount, 'currency': currency,
+                  'nonce': str(int(time.time() * 1000)), 'price': price, 'type': order_type}
         params['signature'] = build_exx_sign(params, self.__secret_key)
         param_str = 'accesskey=%(accesskey)s&amount=%(amount)s&currency=%(currency)s&nonce=%(nonce)s&price=%(' \
                     'price)s&type=%(type)s&signature=%(signature)s' % params
         result = http_get(self.__url + ExxTrade.ORDER_RESOURCE + '?' + param_str)
+        print(result)
         if result['code'] == 100:
             return result['id']
         print(result['message'])
@@ -67,6 +69,7 @@ class ExxTrade(object):
         params['signature'] = build_exx_sign(params, self.__secret_key)
         param_str = 'accesskey=%(accesskey)s&currency=%(currency)s&id=%(id)s&nonce=%(nonce)s&signature=%(signature)s' % params
         result = http_get(self.__url + ExxTrade.CANCEL_RESOURCE + '?' + param_str)
+        print(result)
         if result['code'] == 100:
             return True
         print(result['message'])
@@ -86,13 +89,16 @@ class ExxTrade(object):
         self.cancel_orders(open_orders)
 
     WITHDRAW_FEES = {
-        'qtum': {'fee_type': 'float', 'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
+        'qtum': {'fee_type': 'float', 'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00,
+                 'each_quota': 1000.00,
                  'min_amount': 0.0000001},
-        'btc': {'fee_type': 'float', 'fee_ratio': 0.001, 'min_fee': 0.0000001, 'daily_quota': 10, 'each_quota': 3, 'min_amount': 0.0000001},
+        'btc': {'fee_type': 'float', 'fee_ratio': 0.001, 'min_fee': 0.0000001, 'daily_quota': 10, 'each_quota': 3,
+                'min_amount': 0.0000001},
         'spc': {'fee_type': 'fixed', 'fee_ratio': 20.0, 'min_fee': 20, 'daily_quota': 1000000, 'each_quota': 100000,
                 'min_amount': 100}
     }
-    DEFAULT_WITHDRAW_FEE = {'fee_type': 'float', 'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00, 'each_quota': 1000.00,
+    DEFAULT_WITHDRAW_FEE = {'fee_type': 'float', 'fee_ratio': 0.01, 'min_fee': 0.0000001, 'daily_quota': 5000.00,
+                            'each_quota': 1000.00,
                             'min_amount': 0.0000001}
 
     @staticmethod

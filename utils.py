@@ -39,5 +39,8 @@ def build_bit_z_sign(params, secret_key):
     sign = ''
     for key in sorted(params.keys()):
         sign += key + '=' + str(params[key]) + '&'
-    data = sign + secret_key
+    if len(sign) > 0:
+        data = sign[:-1] + secret_key
+    else:
+        data = secret_key
     return hashlib.md5(data.encode("utf8")).hexdigest()
