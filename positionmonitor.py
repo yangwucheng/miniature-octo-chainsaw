@@ -9,13 +9,16 @@ from bitz.settlement import BitZSettlement
 from common.settlementfactory import SettlementFactory
 from constants import Constants
 
+# read config
 config = configparser.ConfigParser()
 config.read(['config.ini', 'secret_config.ini'])
 
+# all coin config
 all_coin_trade_url = config['allcoin']['trade_url']
 all_coin_api_key = config['allcoin']['api_key']
 all_coin_secret_key = config['allcoin']['secret_key']
 
+# all coin position manager
 all_coin_position = AllCoinPosition(
     init_positions={
         'oc': 0.0,
@@ -32,10 +35,12 @@ all_coin_position = AllCoinPosition(
     secret_key=all_coin_secret_key
 )
 
+# bit z config
 bit_z_trade_url = config['bitz']['trade_url']
 bit_z_api_key = config['bitz']['api_key']
 bit_z_secret_key = config['bitz']['secret_key']
 
+# bit z position manager
 bit_z_position = BitZPosition(
     init_positions={
         'oc': 45454.49000000,
@@ -52,6 +57,7 @@ bit_z_position = BitZPosition(
     secret_key=bit_z_secret_key
 )
 
+# settlement set up
 all_coin_settlement = AllCoinSettlement()
 bit_z_settlement = BitZSettlement()
 SettlementFactory.settlements = {
@@ -60,11 +66,13 @@ SettlementFactory.settlements = {
 }
 SettlementFactory.default_settlement = bit_z_settlement
 
+# init trading pairs
 r = redis.StrictRedis()
 oc_btc_symbol = 'oc_btc'
 r.sadd(Constants.REDIS_KEY_ALL_COIN_TRADE_PAIRS, oc_btc_symbol)
 r.sadd(Constants.REDIS_KEY_BIT_Z_TRADE_PAIRS, oc_btc_symbol)
 
+# loop position manager
 while True:
     bit_z_position.run()
     all_coin_position.run()

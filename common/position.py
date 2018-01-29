@@ -21,27 +21,40 @@ class Position(object):
 
     @abstractmethod
     def get_orders(self, symbol: str, order_ids: list) -> list:
+        """
+
+        :param symbol:
+        :param order_ids:
+        :return: list of orders
+        """
         pass
 
     def get_position(self, coin: str) -> float:
-        quantity = self.__redis.hmget(self.__position_redis_key, coin)
+        """
+
+        :param coin:
+        :return: corresponding position
+        """
+        quantity = self.__redis.hget(self.__position_redis_key, coin)
         if quantity is None:
             quantity = 0.0
+        else:
+            quantity = float(quantity.decode())
         return quantity
 
     def update_position(self, coin: str, delta: float):
-        quantity = self.__redis.hmget(self.__position_redis_key, coin)
-        if quantity is None:
-            quantity = 0.0
+        quantity = self.get_position(coin)
         self.__redis.hset(self.__position_redis_key, coin, quantity + delta)
 
     def run(self):
         symbols = self.__redis.smembers(self.__trade_pair_redis_key)
+        symbols = [x.decode() for x in symbols]
 
         for symbol in symbols:
-            symbol = symbol.decode()
             open_order_ids = self.__redis.smembers(self.__open_order_redis_key_prefix + ':' + symbol)
+            open_order_ids = set([x.decode() for x in open_order_ids])
             cancelled_order_ids = self.__redis.smembers(self.__cancelled_order_redis_key_prefix + ':' + symbol)
+            cancelled_order_ids = set([x.decode() for x in cancelled_order_ids])
             order_ids = open_order_ids | cancelled_order_ids
             orders = self.get_orders(symbol, order_ids)
             for order in orders:

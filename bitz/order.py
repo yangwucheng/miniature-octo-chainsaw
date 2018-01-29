@@ -18,11 +18,11 @@ class BitZOrder(Order):
         super(BitZOrder, self).__init__(
             exchange=Constants.EXCHANGE_NAME_BIT_Z,
             order_id=order_dict['id'],
-            order_type=BitZHelper.get_repsonse_order_type(order_dict['flag']),
+            order_type=BitZHelper.get_response_order_type(order_dict['flag']),
             symbol=symbol,
-            price=order_dict['price'],
-            avg_price=order_dict['price'],
-            quantity=order_dict['number'],
-            filled_quantity=order_dict['numberover'],
-            status=BitZHelper.get_response_status(order_dict['status'], order_dict['number'], order_dict['numberover'])
+            price=float(order_dict['price']),
+            avg_price=float(order_dict['price']),
+            quantity=float(order_dict['number']),
+            filled_quantity=float(order_dict['numberover']),
+            status=BitZHelper.get_response_status(order_dict['status'], float(order_dict['number']), float(order_dict['numberover']))
         )
