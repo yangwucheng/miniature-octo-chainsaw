@@ -47,6 +47,9 @@ class Order(object):
     def get_symbol(self):
         return self.__symbol
 
+    def get_quantity(self):
+        return self.__quantity
+
     def get_filled_quantity(self):
         return self.__filled_quantity
 

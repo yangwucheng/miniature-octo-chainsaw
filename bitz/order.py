@@ -24,5 +24,6 @@ class BitZOrder(Order):
             avg_price=float(order_dict['price']),
             quantity=float(order_dict['number']),
             filled_quantity=float(order_dict['numberover']),
-            status=BitZHelper.get_response_status(order_dict['status'], float(order_dict['number']), float(order_dict['numberover']))
+            status=BitZHelper.get_response_status(order_dict['status'], float(order_dict['number']),
+                                                  float(order_dict['numberover']))
         )

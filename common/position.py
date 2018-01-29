@@ -59,6 +59,7 @@ class Position(object):
             orders = self.get_orders(symbol, order_ids)
             for order in orders:
                 order_id = order.get_order_id()
+                quantity = order.get_quantity()
                 filled_quantity = order.get_filled_quantity()
                 avg_price = order.get_avg_price()
                 fee = order.get_fee()
@@ -78,9 +79,19 @@ class Position(object):
                     if order.is_buy():
                         exchange_coin_delta = -1 * (fee / avg_price)
                         exchange_coin_delta += filled_quantity
-                        base_coin_delta = -1 * avg_price * filled_quantity
+                        if status == Constants.ORDER_STATUS_FILLED:
+                            # base_coin_delta = -1 * avg_price * filled_quantity
+                            # base coin has already update when create order
+                            base_coin_delta = 0.0
+                        else:
+                            base_coin_delta = avg_price * (quantity - filled_quantity)
                     else:
-                        exchange_coin_delta = -1 * filled_quantity
+                        if status == Constants.ORDER_STATUS_FILLED:
+                            # exchange_coin_delta = -1 * filled_quantity
+                            # exchange coin has already update when create order
+                            exchange_coin_delta = 0.0
+                        else:
+                            exchange_coin_delta = quantity - filled_quantity
                         base_coin_delta = -1 * fee
                         base_coin_delta += avg_price * filled_quantity
 

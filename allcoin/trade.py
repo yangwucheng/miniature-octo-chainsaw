@@ -4,7 +4,7 @@ import redis
 
 from allcoin.helper import AllCoinHelper
 from constants import Constants
-from utils import build_all_coin_sign, http_post
+from utils import build_all_coin_sign, http_post, extract_symbol
 
 
 class AllCoinTrade(object):
@@ -18,6 +18,23 @@ class AllCoinTrade(object):
         self.__api_key = api_key
         self.__secret_key = secret_key
         self.__redis = redis.StrictRedis()
+
+    def get_position(self, coin: str) -> float:
+        """
+
+        :param coin:
+        :return: corresponding position
+        """
+        quantity = self.__redis.hget(Constants.REDIS_KEY_ALL_COIN_POSITIONS, coin)
+        if quantity is None:
+            quantity = 0.0
+        else:
+            quantity = float(quantity.decode())
+        return quantity
+
+    def update_position(self, coin: str, delta: float):
+        quantity = self.get_position(coin)
+        self.__redis.hset(Constants.REDIS_KEY_ALL_COIN_POSITIONS, coin, quantity + delta)
 
     def order(self, order_type, symbol, price, amount):
         # type: (str, str, str, str) -> str
@@ -49,6 +66,15 @@ class AllCoinTrade(object):
                 'created': time.time(),
                 'status': Constants.ORDER_STATUS_NEW
             })
+            trade_pair = extract_symbol(symbol)
+            exchange_coin = trade_pair[0]
+            base_coin = trade_pair[1]
+            if order_type == 'buy':
+                base_coin_delta = -1 * float(price) * float(amount)
+                self.update_position(base_coin, base_coin_delta)
+            else:
+                exchange_coin_delta = -1 * float(amount)
+                self.update_position(exchange_coin, exchange_coin_delta)
             return order_id
         print(result)
         return None
