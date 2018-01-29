@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 import redis
 
-from common.order import Order
 from constants import Constants
+from utils import extract_symbol
 
 
 class Position(object):
@@ -20,8 +20,14 @@ class Position(object):
         self.__trade_pair_redis_key = trade_pair_redis_key
 
     @abstractmethod
-    def get_orders(self, symbol: str, order_ids: list[str]) -> list[Order]:
+    def get_orders(self, symbol: str, order_ids: list) -> list:
         pass
+
+    def get_position(self, coin: str) -> float:
+        quantity = self.__redis.hmget(self.__position_redis_key, coin)
+        if quantity is None:
+            quantity = 0.0
+        return quantity
 
     def update_position(self, coin: str, delta: float):
         quantity = self.__redis.hmget(self.__position_redis_key, coin)
@@ -33,6 +39,7 @@ class Position(object):
         symbols = self.__redis.smembers(self.__trade_pair_redis_key)
 
         for symbol in symbols:
+            symbol = symbol.decode()
             open_order_ids = self.__redis.smembers(self.__open_order_redis_key_prefix + ':' + symbol)
             cancelled_order_ids = self.__redis.smembers(self.__cancelled_order_redis_key_prefix + ':' + symbol)
             order_ids = open_order_ids | cancelled_order_ids
@@ -43,7 +50,7 @@ class Position(object):
                 avg_price = order.get_avg_price()
                 fee = order.get_fee()
                 status = order.get_status()
-                self.__redis.hmset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, {
+                self.__redis.hmset(self.__order_redis_key_prefix + ':' + symbol + ':' + order_id, {
                     'order_id': order_id,
                     'avg_price': avg_price,
                     'filled_quantity': filled_quantity,
@@ -52,13 +59,20 @@ class Position(object):
                 })
 
                 if status == Constants.ORDER_STATUS_FILLED or status == Constants.ORDER_STATUS_CANCELLED:
-                    delta = -1 * fee
+                    trade_pair = extract_symbol(symbol)
+                    exchange_coin = trade_pair[0]
+                    base_coin = trade_pair[1]
                     if order.is_buy():
-                        delta += filled_quantity
+                        exchange_coin_delta = -1 * (fee / avg_price)
+                        exchange_coin_delta += filled_quantity
+                        base_coin_delta = -1 * avg_price * filled_quantity
                     else:
-                        delta += -1 * filled_quantity
+                        exchange_coin_delta = -1 * filled_quantity
+                        base_coin_delta = -1 * fee
+                        base_coin_delta += avg_price * filled_quantity
 
-                    self.update_position(delta)
+                    self.update_position(exchange_coin, exchange_coin_delta)
+                    self.update_position(base_coin, base_coin_delta)
 
             for order_id in cancelled_order_ids:
                 self.__redis.srem(self.__cancelled_order_redis_key_prefix + ':' + symbol, order_id)

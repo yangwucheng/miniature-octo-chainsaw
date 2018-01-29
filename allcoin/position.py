@@ -81,7 +81,7 @@ class AllCoinPosition(Position):
 
         return orders
 
-    def get_orders(self, symbol: str, order_ids: list[str]) -> list[AllCoinOrder]:
+    def get_orders(self, symbol: str, order_ids: list) -> list:
         orders = []
         order_count = len(order_ids)
         per_request_count = 50

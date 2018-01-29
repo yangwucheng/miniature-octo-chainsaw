@@ -1,11 +1,9 @@
 import random
-
 import time
 
-from allcoin.order import AllCoinOrder
 from bitz.order import BitZOrder
 from common.position import Position
-from utils import build_all_coin_sign, http_post, build_bit_z_sign
+from utils import http_post, build_bit_z_sign
 
 
 class BitZPosition(Position):
@@ -36,7 +34,7 @@ class BitZPosition(Position):
         self.__api_key = api_key
         self.__secret_key = secret_key
 
-    def get_orders(self, symbol: str, order_ids: list[str]) -> list[BitZOrder]:
+    def get_orders(self, symbol: str, order_ids: list) -> list:
         """
 
         :param symbol:

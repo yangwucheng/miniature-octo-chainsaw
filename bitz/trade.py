@@ -32,8 +32,8 @@ class BitZTrade(object):
         # print(result)
         if result['code'] == 0:
             order_id = result['data']['id']
-            self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS + ':' + coin, order_id)
-            self.__redis.hmset(Constants.REDIS_KEY_BIT_Z_ORDER + ':' + coin + ':' + order_id, {
+            self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX + ':' + coin, order_id)
+            self.__redis.hmset(Constants.REDIS_KEY_BIT_Z_ORDER_PREFIX + ':' + coin + ':' + order_id, {
                 'order_id': order_id,
                 'order_type': BitZHelper.get_order_type(order_type),
                 'symbol': coin,
@@ -63,9 +63,9 @@ class BitZTrade(object):
         params['sign'] = build_bit_z_sign(params, self.__secret_key)
         result = http_post(self.__url + BitZTrade.CANCEL_RESOURCE, params)
         if result['code'] == 0:
-            self.__redis.srem(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS + ':' + coin, order_id)
-            self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_CANCELLED_ORDER_IDS + ':' + coin, order_id)
-            self.__redis.hset(Constants.REDIS_KEY_BIT_Z_ORDER + ':' + coin + ':' + order_id, 'status',
+            self.__redis.srem(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX + ':' + coin, order_id)
+            self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_CANCELLED_ORDER_IDS_PREFIX + ':' + coin, order_id)
+            self.__redis.hset(Constants.REDIS_KEY_BIT_Z_ORDER_PREFIX + ':' + coin + ':' + order_id, 'status',
                               Constants.ORDER_STATUS_CANCELLED)
         return result
 

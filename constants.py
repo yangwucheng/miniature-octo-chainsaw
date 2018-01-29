@@ -21,15 +21,22 @@ class Constants(object):
         'sale': ORDER_TYPE_SELL
     }
 
-    REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS = 'allCoinOpenOrderIds'
-    REDIS_KEY_ALL_COIN_CANCELLED_ORDER_IDS = 'allCoinCancelledOrderIds'
-    REDIS_KEY_ALL_COIN_CLOSED_ORDER_IDS = 'allCoinClosedOrderIds'
-    REDIS_KEY_ALL_COIN_ORDER_PREFIX = 'allCoinOrder'
+    EXCHANGE_NAME_ALL_COIN = 'allCoin'
+    EXCHANGE_NAME_BIT_Z = 'bitZ'
 
-    REDIS_KEY_BIT_Z_OPEN_ORDER_IDS = 'bitZOpenOrderIds'
-    REDIS_KEY_BIT_Z_CANCELLED_ORDER_IDS = 'bitZCancelledOrderIds'
-    REDIS_KEY_BIT_Z_Closed_ORDER_IDS = 'bitZClosedOrderIds'
-    REDIS_KEY_BIT_Z_ORDER = 'bitZOrder'
+    REDIS_KEY_ALL_COIN_POSITIONS = 'allCoinPositions'
+    REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX = 'allCoinOpenOrderIds'
+    REDIS_KEY_ALL_COIN_CANCELLED_ORDER_IDS_PREFIX = 'allCoinCancelledOrderIds'
+    REDIS_KEY_ALL_COIN_CLOSED_ORDER_IDS_PREFIX = 'allCoinClosedOrderIds'
+    REDIS_KEY_ALL_COIN_ORDER_PREFIX = 'allCoinOrder'
+    REDIS_KEY_ALL_COIN_TRADE_PAIRS = 'allCoinTradePairs'
+
+    REDIS_KEY_BIT_Z_POSITIONS = 'bitZPositions'
+    REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX = 'bitZOpenOrderIds'
+    REDIS_KEY_BIT_Z_CANCELLED_ORDER_IDS_PREFIX = 'bitZCancelledOrderIds'
+    REDIS_KEY_BIT_Z_CLOSED_ORDER_IDS_PREFIX = 'bitZClosedOrderIds'
+    REDIS_KEY_BIT_Z_ORDER_PREFIX = 'bitZOrder'
+    REDIS_KEY_BIT_Z_TRADE_PAIRS = 'bitZTradePairs'
 
     ALL_COIN_ORDER_STATUS_NEW = 0
     ALL_COIN_ORDER_STATUS_PARTIALLY_FILLED = 1

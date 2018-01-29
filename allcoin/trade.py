@@ -37,7 +37,7 @@ class AllCoinTrade(object):
         result = http_post(self.__url + AllCoinTrade.ORDER_RESOURCE, params, verify=False)
         if result['result'] == 'true':
             order_id = result['order_id']
-            self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS + ':' + symbol, order_id)
+            self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX + ':' + symbol, order_id)
             self.__redis.hmset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, {
                 'order_id': order_id,
                 'order_type': AllCoinHelper.get_order_type(order_type),
@@ -74,8 +74,8 @@ class AllCoinTrade(object):
         # {'order_id': '59770590', 'result': True}
         result = http_post(self.__url + AllCoinTrade.CANCEL_RESOURCE, params, verify=False)
         if 'result' in result:
-            self.__redis.srem(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS + ':' + symbol, order_id)
-            self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_CANCELLED_ORDER_IDS + ':' + symbol, order_id)
+            self.__redis.srem(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX + ':' + symbol, order_id)
+            self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_CANCELLED_ORDER_IDS_PREFIX + ':' + symbol, order_id)
             self.__redis.hset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, 'status',
                               Constants.ORDER_STATUS_CANCELLED)
             return result['result']
