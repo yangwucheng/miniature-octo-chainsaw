@@ -1,7 +1,7 @@
 from abc import abstractmethod
 
-from settlement.fee import Fee
-from settlement.withdraw import Withdraw
+from common.fee import Fee
+from common.withdraw import Withdraw
 
 
 class Settlement(object):

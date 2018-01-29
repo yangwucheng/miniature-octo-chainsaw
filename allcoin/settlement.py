@@ -1,5 +1,5 @@
-from settlement.fee import FeeType
-from settlement.settlement import Settlement
+from common.fee import FeeType
+from common.settlement import Settlement
 
 
 class AllCoinSettlement(Settlement):
@@ -35,7 +35,8 @@ class AllCoinSettlement(Settlement):
         if symbol.lower() in self.get_sell_fee_dicts():
             sell_fee_dict = self.get_sell_fee_dicts()[symbol.lower()]
 
-        if sell_fee_dict['min_price'] <= price <= sell_fee_dict['max_price'] and amount >= sell_fee_dict['min_quantity']:
+        if sell_fee_dict['min_price'] <= price <= sell_fee_dict['max_price'] and amount >= sell_fee_dict[
+            'min_quantity']:
             return True
         return False
 

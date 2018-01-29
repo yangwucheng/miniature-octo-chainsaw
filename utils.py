@@ -44,3 +44,8 @@ def build_bit_z_sign(params, secret_key):
     else:
         data = secret_key
     return hashlib.md5(data.encode("utf8")).hexdigest()
+
+
+def extract_symbol(symbol):
+    # type: (str) -> list
+    return symbol.split('_')

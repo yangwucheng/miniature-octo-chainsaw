@@ -1,8 +1,13 @@
+import time
+
+import redis
+
+from allcoin.helper import AllCoinHelper
+from constants import Constants
 from utils import build_all_coin_sign, http_post
 
 
 class AllCoinTrade(object):
-    BALANCE_RESOURCE = '/api/v1/userinfo'
     ORDER_RESOURCE = '/api/v1/trade'
     CANCEL_RESOURCE = '/api/v1/cancel_order'
     OPEN_ORDERS_RESOURCE = '/api/v1/order_history'
@@ -12,173 +17,7 @@ class AllCoinTrade(object):
         self.__url = url
         self.__api_key = api_key
         self.__secret_key = secret_key
-
-    def get_balance(self):
-        """
-
-        :return:
-        {
-            'info': {
-                'funds': {
-                    'free': {
-                        'a0101': '0.0000000000000000',
-                        'acc': '0.0000000000000000',
-                        'act': '0.0000000000000000',
-                        'aic': '0.0000000000000000',
-                        'aicc': '0.0000000000000000',
-                        'aidoc': '0.0000000000000000',
-                        'atn': '0.0000000000000000',
-                        'awr': '0.0000000000000000',
-                        'bash': '0.0000000000000000',
-                        'bcd': '0.0000000000000000',
-                        'bch': '0.0000000000000000',
-                        'bec': '0.0000000000000000',
-                        'bot': '0.0000000000000000',
-                        'btc': '0.0419170382000000',
-                        'bte': '0.0000000000000000',
-                        'btf': '0.0000000000000000',
-                        'btg': '0.0000000000000000',
-                        'btm': '0.0000000000000000',
-                        'cfs': '0.0000000000000000',
-                        'cfun': '0.0000000000000000',
-                        'ck.usd': '0.0000000000000000',
-                        'cnet': '0.0000000000000000',
-                        'dbc': '0.0000000000000000',
-                        'dwc': '0.0000000000000000',
-                        'ent': '0.0000000000000000',
-                        'eth': '0.0000000000000000',
-                        'fid': '0.0000000000000000',
-                        'game': '0.0000000000000000',
-                        'gnx': '0.0000000000000000',
-                        'god': '0.0000000000000000',
-                        'gp': '0.0000000000000000',
-                        'gxs': '0.0000000000000000',
-                        'hlc': '0.0000000000000000',
-                        'hpb': '0.0000000000000000',
-                        'hsr': '0.0000000000000000',
-                        'ink': '0.0000000000000000',
-                        'int': '0.0000000000000000',
-                        'iqt': '0.0000000000000000',
-                        'kct': '0.0000000000000000',
-                        'lbtc': '0.0000000000000000',
-                        'lmc': '0.0000000000000000',
-                        'ltc': '0.0000000000000000',
-                        'mcc': '0.0000000000000000',
-                        'mda': '0.0000000000000000',
-                        'mgo': '0.0000000000000000',
-                        'nas': '0.0000000000000000',
-                        'neo': '0.0000000000000000',
-                        'oc': '22725.1200000000000000',
-                        'pcash': '0.0000000000000000',
-                        'put': '0.0000000000000000',
-                        'qbt': '0.0000000000000000',
-                        'qtum': '0.0002990000000000',
-                        'sbtc': '0.0000000000000000',
-                        'sigma': '0.0000000000000000',
-                        'spc': '0.0000000000000000',
-                        'tsl': '0.0000000000000000',
-                        'ugc': '0.0000000000000000',
-                        'uip': '0.0000000000000000',
-                        'usd': '0.0000000000000000',
-                        'walton': '0.0000000000000000',
-                        'wid': '0.0000000000000000',
-                        'xkc': '0.0000000000000000',
-                        'ybct': '0.0000000000000000',
-                        'yuan': '0.0000000000000000',
-                        'zec': '0.0000000000000000'
-                    },
-                    'freezed': {
-                        'a0101': '0.0000000000000000',
-                        'acc': '0.0000000000000000',
-                        'act': '0.0000000000000000',
-                        'aic': '0.0000000000000000',
-                        'aicc': '0.0000000000000000',
-                        'aidoc': '0.0000000000000000',
-                        'atn': '0.0000000000000000',
-                        'awr': '0.0000000000000000',
-                        'bash': '0.0000000000000000',
-                        'bcd': '0.0000000000000000',
-                        'bch': '0.0000000000000000',
-                        'bec': '0.0000000000000000',
-                        'bot': '0.0000000000000000',
-                        'btc': '0.0000000000000000',
-                        'bte': '0.0000000000000000',
-                        'btf': '0.0000000000000000',
-                        'btg': '0.0000000000000000',
-                        'btm': '0.0000000000000000',
-                        'cfs': '0.0000000000000000',
-                        'cfun': '0.0000000000000000',
-                        'ck.usd': '0.0000000000000000',
-                        'cnet': '0.0000000000000000',
-                        'dbc': '0.0000000000000000',
-                        'dwc': '0.0000000000000000',
-                        'ent': '0.0000000000000000',
-                        'eth': '0.0000000000000000',
-                        'fid': '0.0000000000000000',
-                        'game': '0.0000000000000000',
-                        'gnx': '0.0000000000000000',
-                        'god': '0.0000000000000000',
-                        'gp': '0.0000000000000000',
-                        'gxs': '0.0000000000000000',
-                        'hlc': '0.0000000000000000',
-                        'hpb': '0.0000000000000000',
-                        'hsr': '0.0000000000000000',
-                        'ink': '0.0000000000000000',
-                        'int': '0.0000000000000000',
-                        'iqt': '0.0000000000000000',
-                        'kct': '0.0000000000000000',
-                        'lbtc': '0.0000000000000000',
-                        'lmc': '0.0000000000000000',
-                        'ltc': '0.0000000000000000',
-                        'mcc': '0.0000000000000000',
-                        'mda': '0.0000000000000000',
-                        'mgo': '0.0000000000000000',
-                        'nas': '0.0000000000000000',
-                        'neo': '0.0000000000000000',
-                        'oc': '500.0000000000000000',
-                        'pcash': '0.0000000000000000',
-                        'put': '0.0000000000000000',
-                        'qbt': '0.0000000000000000',
-                        'qtum': '0.0000000000000000',
-                        'sbtc': '0.0000000000000000',
-                        'sigma': '0.0000000000000000',
-                        'spc': '5951.0000000000000000',
-                        'tsl': '0.0000000000000000',
-                        'ugc': '0.0000000000000000',
-                        'uip': '0.0000000000000000',
-                        'usd': '0.0000000000000000',
-                        'walton': '0.0000000000000000',
-                        'wid': '0.0000000000000000',
-                        'xkc': '0.0000000000000000',
-                        'ybct': '0.0000000000000000',
-                        'yuan': '0.0000000000000000',
-                        'zec': '0.0000000000000000'
-                    }
-                }
-            },
-            'result': 'true'
-        } {
-            'oc': '22725.1200000000000000',
-            'btc': '0.0419170382000000'
-        }
-        """
-        params = {'api_key': self.__api_key}
-        params['sign'] = build_all_coin_sign(params, self.__secret_key)
-        return http_post(self.__url + AllCoinTrade.BALANCE_RESOURCE, params, verify=False)
-
-    def get_fund_free(self, assets):
-        # type: (list) -> dict
-        """
-
-        :return:
-        {'oc': '22925.1200000000000000', 'btc': '0.0419170382000000'}
-        """
-        balance = self.get_balance()
-        print(balance)
-        fund_frees = {}
-        for asset in assets:
-            fund_frees[asset] = balance['info']['funds']['free'][asset]
-        return fund_frees
+        self.__redis = redis.StrictRedis()
 
     def order(self, order_type, symbol, price, amount):
         # type: (str, str, str, str) -> str
@@ -197,7 +36,20 @@ class AllCoinTrade(object):
         # {'error_code': '10013', 'result': False}
         result = http_post(self.__url + AllCoinTrade.ORDER_RESOURCE, params, verify=False)
         if result['result'] == 'true':
-            return result['order_id']
+            order_id = result['order_id']
+            self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS + ':' + symbol, order_id)
+            self.__redis.hmset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, {
+                'order_id': order_id,
+                'order_type': AllCoinHelper.get_order_type(order_type),
+                'symbol': symbol,
+                'order_price': price,
+                'quantity': amount,
+                'filled_quantity': 0.0,
+                'fee': 0.0,
+                'created': time.time(),
+                'status': Constants.ORDER_STATUS_NEW
+            })
+            return order_id
         print(result)
         return None
 
@@ -222,6 +74,10 @@ class AllCoinTrade(object):
         # {'order_id': '59770590', 'result': True}
         result = http_post(self.__url + AllCoinTrade.CANCEL_RESOURCE, params, verify=False)
         if 'result' in result:
+            self.__redis.srem(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS + ':' + symbol, order_id)
+            self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_CANCELLED_ORDER_IDS + ':' + symbol, order_id)
+            self.__redis.hset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, 'status',
+                              Constants.ORDER_STATUS_CANCELLED)
             return result['result']
         return result
 

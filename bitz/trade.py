@@ -1,6 +1,10 @@
 import random
 import time
 
+import redis
+
+from bitz.helper import BitZHelper
+from constants import Constants
 from utils import build_bit_z_sign, http_post
 
 
@@ -15,6 +19,7 @@ class BitZTrade(object):
         self.__api_key = api_key
         self.__secret_key = secret_key
         self.__trade_pwd = trade_pwd
+        self.__redis = redis.StrictRedis()
 
     def order(self, order_type, coin, price, number):
         # type: (str, str, str, str) -> str
@@ -26,7 +31,20 @@ class BitZTrade(object):
         result = http_post(self.__url + BitZTrade.ORDER_RESOURCE, params)
         # print(result)
         if result['code'] == 0:
-            return result['data']
+            order_id = result['data']['id']
+            self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS + ':' + coin, order_id)
+            self.__redis.hmset(Constants.REDIS_KEY_BIT_Z_ORDER + ':' + coin + ':' + order_id, {
+                'order_id': order_id,
+                'order_type': BitZHelper.get_order_type(order_type),
+                'symbol': coin,
+                'order_price': price,
+                'quantity': number,
+                'filled_quantity': 0.0,
+                'fee': 0.0,
+                'created': time.time(),
+                'status': Constants.ORDER_STATUS_NEW
+            })
+            return order_id
         print(result)
         return None
 
@@ -38,12 +56,17 @@ class BitZTrade(object):
         # type: (str, str, str) -> str
         return self.order('out', coin, price, number)
 
-    def cancel_order(self, order_id):
+    def cancel_order(self, coin, order_id):
         # type: (str) -> object
         params = {'api_key': self.__api_key, 'id': str(order_id), 'timestamp': str(int(time.time())),
                   'nonce': '%06d' % random.randint(0, 999999)}
         params['sign'] = build_bit_z_sign(params, self.__secret_key)
         result = http_post(self.__url + BitZTrade.CANCEL_RESOURCE, params)
+        if result['code'] == 0:
+            self.__redis.srem(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS + ':' + coin, order_id)
+            self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_CANCELLED_ORDER_IDS + ':' + coin, order_id)
+            self.__redis.hset(Constants.REDIS_KEY_BIT_Z_ORDER + ':' + coin + ':' + order_id, 'status',
+                              Constants.ORDER_STATUS_CANCELLED)
         return result
 
     def get_open_orders(self, coin):
@@ -90,11 +113,11 @@ class BitZTrade(object):
         print(result)
         return result
 
-    def cancel_orders(self, open_orders):
+    def cancel_orders(self, coin, open_orders):
         for open_order in open_orders:
             print('cancel order', open_order)
-            self.cancel_order(open_order['id'])
+            self.cancel_order(coin, open_order['id'])
 
     def cancel_all_orders(self, coin):
         open_orders = self.get_open_orders(coin)
-        self.cancel_orders(open_orders)
+        self.cancel_orders(coin, open_orders)

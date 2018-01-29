@@ -1,5 +1,5 @@
-from settlement.fee import FeeType
-from settlement.settlement import Settlement
+from common.fee import FeeType
+from common.settlement import Settlement
 
 
 class BitZSettlement(Settlement):

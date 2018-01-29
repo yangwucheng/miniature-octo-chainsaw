@@ -89,37 +89,37 @@ if __name__ == '__main__':
                 # pnl = calculate_pnl(buy_price_float, sell_price_float, amount_float, buy_fee, sell_fee, buy_withdraw_fee, sell_withdraw_fee)
                 pnl = calculate_pnl(buy_price_float, sell_price_float, amount_float, buy_fee, sell_fee)
                 if pnl > 0 and sell_price_float / buy_price_float > 1.08:
-                    all_coin_trade.buy(symbol, buy_price_str, amount_str)
-                    bit_z_trade.sell(symbol, sell_price_str, amount_str)
+                    # all_coin_trade.buy(symbol, buy_price_str, amount_str)
+                    # bit_z_trade.sell(symbol, sell_price_str, amount_str)
 
                     remain_amount -= amount_float
                     print('buy price %s buy amount %s' % (buy_price_str, amount_str))
                     print('sell price %s sell amount %s' % (sell_price_str, amount_str))
 
-                # print('sell price, buy price, amount, sell fee, buy fee, pnl')
-                # print(
-                #     '%(sell_price)s, %(buy_price)s, %(amount)s, %(sell_fee).8f, %(buy_fee).8f, '
-                #     '%(pnl).8f' % {
-                #         'sell_price': sell_price_str,
-                #         'buy_price': buy_price_str,
-                #         'amount': amount_str,
-                #         'sell_fee': sell_fee,
-                #         'buy_fee': buy_fee,
-                #         'pnl': pnl
-                #     })
+                    # print('sell price, buy price, amount, sell fee, buy fee, pnl')
+                    # print(
+                    #     '%(sell_price)s, %(buy_price)s, %(amount)s, %(sell_fee).8f, %(buy_fee).8f, '
+                    #     '%(pnl).8f' % {
+                    #         'sell_price': sell_price_str,
+                    #         'buy_price': buy_price_str,
+                    #         'amount': amount_str,
+                    #         'sell_fee': sell_fee,
+                    #         'buy_fee': buy_fee,
+                    #         'pnl': pnl
+                    #     })
 
-                # print('sell price, buy price, amount, sell fee, buy fee, sell withdraw fee, buy withdraw fee, pnl')
-                # print(
-                #     '%(sell_price)s, %(buy_price).8f, %(amount)s, %(sell_fee).8f, %(buy_fee).8f, '
-                #     '%(sell_withdraw_fee).8f, %(buy_withdraw_fee).8f, %(pnl).8f' % {
-                #         'sell_price': sell_price_str,
-                #         'buy_price': buy_price_float,
-                #         'amount': amount_str,
-                #         'sell_fee': sell_fee,
-                #         'buy_fee': buy_fee,
-                #         'sell_withdraw_fee': sell_withdraw_fee,
-                #         'buy_withdraw_fee': buy_withdraw_fee,
-                #         'pnl': pnl
-                #     })
+                    # print('sell price, buy price, amount, sell fee, buy fee, sell withdraw fee, buy withdraw fee, pnl')
+                    # print(
+                    #     '%(sell_price)s, %(buy_price).8f, %(amount)s, %(sell_fee).8f, %(buy_fee).8f, '
+                    #     '%(sell_withdraw_fee).8f, %(buy_withdraw_fee).8f, %(pnl).8f' % {
+                    #         'sell_price': sell_price_str,
+                    #         'buy_price': buy_price_float,
+                    #         'amount': amount_str,
+                    #         'sell_fee': sell_fee,
+                    #         'buy_fee': buy_fee,
+                    #         'sell_withdraw_fee': sell_withdraw_fee,
+                    #         'buy_withdraw_fee': buy_withdraw_fee,
+                    #         'pnl': pnl
+                    #     })
         except Exception as e:
             print(e)
