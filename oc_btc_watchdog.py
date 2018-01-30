@@ -14,14 +14,9 @@ if __name__ == '__main__':
 
     bit_z_market_url = config['bitz']['market_url']
     bit_z_market = BitZMarket(bit_z_market_url)
-    remain_amount = 12000.0
 
     while True:
         try:
-            if remain_amount <= 1.0:
-                tkinter.messagebox.showinfo("Arbitrage Finished", 'Transfer Coin')
-                break
-
             all_coin_asks = all_coin_market.oc_btc_asks()
             all_coin_ask_1_price_float = all_coin_asks[0][0]
             all_coin_ask_1_volume_float = all_coin_asks[0][1]
@@ -40,18 +35,12 @@ if __name__ == '__main__':
             amount_float = all_coin_ask_1_volume_float
             if amount_float > bit_z_bid_1_volume_float:
                 amount_float = bit_z_bid_1_volume_float
-            if amount_float > 10000:
-                amount_float = 10000
-            if amount_float > remain_amount:
-                amount_float = remain_amount
             amount_str = '%.2f' % amount_float
 
-            symbol = 'oc_btc'
-            if sell_price_float / buy_price_float > 1.10:
-                remain_amount -= amount_float
+            if sell_price_float / buy_price_float > 1.08:
                 print(buy_price_str, amount_str)
                 print(sell_price_str, amount_str)
-                tkinter.messagebox.showinfo("价差达到10%以上",
+                tkinter.messagebox.showinfo("价差达到8%以上",
                                             'buy price %s buy volume %s \nsell price %s sell volume %s' %
                                             (buy_price_str, amount_str, sell_price_str, amount_str)
                                             )
