@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     bit_z_settlement = BitZSettlement()
 
-    remain_amount = 6000.0
+    remain_amount = 5000.0
 
     symbol = 'oc_btc'
     min_amount = all_coin_settlement.get_min_buy_quantity(symbol)
@@ -88,9 +88,9 @@ if __name__ == '__main__':
                 # sell_withdraw_fee = bit_z_settlement.calculate_withdraw_fee('btc', amount_float * sell_price_float)
                 # pnl = calculate_pnl(buy_price_float, sell_price_float, amount_float, buy_fee, sell_fee, buy_withdraw_fee, sell_withdraw_fee)
                 pnl = calculate_pnl(buy_price_float, sell_price_float, amount_float, buy_fee, sell_fee)
-                if pnl > 0 and sell_price_float / buy_price_float > 1.08:
-                    # all_coin_trade.buy(symbol, buy_price_str, amount_str)
-                    # bit_z_trade.sell(symbol, sell_price_str, amount_str)
+                if pnl > 0 and sell_price_float / buy_price_float > 1.10:
+                    all_coin_trade.buy(symbol, buy_price_str, amount_str)
+                    bit_z_trade.sell(symbol, sell_price_str, amount_str)
 
                     remain_amount -= amount_float
                     print('buy price %s buy amount %s' % (buy_price_str, amount_str))

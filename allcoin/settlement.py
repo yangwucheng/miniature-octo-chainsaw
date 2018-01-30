@@ -129,7 +129,7 @@ class AllCoinSettlement(Settlement):
             'oc': {
                 'fee_type': FeeType.FLOAT,
                 'amount': 0.002,
-                'min_fee': 320,
+                'min_fee': 600,
                 'max_fee': 9999999.00,
                 'min_amount': 800.00,
                 'max_amount': 4000000.00,

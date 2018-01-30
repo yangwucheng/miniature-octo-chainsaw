@@ -7,19 +7,14 @@ from bitz.market import BitZMarket
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
-    config.read(['config.ini', 'secret_config.ini'])
+    config.read(['config.ini'])
 
     all_coin_market_url = config['allcoin']['market_url']
     all_coin_market = AllCoinMarket(all_coin_market_url)
 
-    all_coin_trade_url = config['allcoin']['trade_url']
-    all_coin_api_key = config['allcoin']['api_key']
-    all_coin_secret_key = config['allcoin']['secret_key']
-    all_coin_trade = AllCoinTrade(all_coin_trade_url, all_coin_api_key, all_coin_secret_key)
-
     bit_z_market_url = config['bitz']['market_url']
     bit_z_market = BitZMarket(bit_z_market_url)
-    remain_amount = 40000.0
+    remain_amount = 12000.0
 
     while True:
         try:
@@ -52,8 +47,7 @@ if __name__ == '__main__':
             amount_str = '%.2f' % amount_float
 
             symbol = 'oc_btc'
-            if sell_price_float / buy_price_float > 1.08:
-                # all_coin_trade.buy(symbol, buy_price_str, amount_str)
+            if sell_price_float / buy_price_float > 1.10:
                 remain_amount -= amount_float
                 print(buy_price_str, amount_str)
                 print(sell_price_str, amount_str)
