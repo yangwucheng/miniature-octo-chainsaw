@@ -53,14 +53,26 @@ class Order(object):
     def get_filled_quantity(self):
         return self.__filled_quantity
 
+    def set_filled_quantity(self, filled_quantity):
+        self.__filled_quantity = filled_quantity
+
+    def get_price(self):
+        return self.__price
+
     def get_avg_price(self):
         return self.__avg_price
+
+    def set_avg_price(self, avg_price):
+        self.__avg_price = avg_price
 
     def get_fee(self):
         return self.__fee
 
     def get_status(self):
         return self.__status
+
+    def set_status(self, status):
+        self.__status = status
 
     def is_buy(self) -> bool:
         if self.get_order_type() == Constants.ORDER_TYPE_BUY:

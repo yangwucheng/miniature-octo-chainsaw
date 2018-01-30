@@ -55,7 +55,7 @@ class Position(object):
             open_order_ids = set([x.decode() for x in open_order_ids])
             cancelled_order_ids = self.__redis.smembers(self.__cancelled_order_redis_key_prefix + ':' + symbol)
             cancelled_order_ids = set([x.decode() for x in cancelled_order_ids])
-            order_ids = open_order_ids | cancelled_order_ids
+            order_ids = list(open_order_ids | cancelled_order_ids)
             orders = self.get_orders(symbol, order_ids)
             for order in orders:
                 order_id = order.get_order_id()

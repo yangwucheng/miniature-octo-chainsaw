@@ -5,7 +5,7 @@ import redis
 
 from bitz.helper import BitZHelper
 from constants import Constants
-from utils import build_bit_z_sign, http_post
+from utils import build_bit_z_sign, http_post, extract_symbol
 
 
 class BitZTrade(object):
@@ -20,6 +20,23 @@ class BitZTrade(object):
         self.__secret_key = secret_key
         self.__trade_pwd = trade_pwd
         self.__redis = redis.StrictRedis()
+
+    def get_position(self, coin: str) -> float:
+        """
+
+        :param coin:
+        :return: corresponding position
+        """
+        quantity = self.__redis.hget(Constants.REDIS_KEY_BIT_Z_POSITIONS, coin)
+        if quantity is None:
+            quantity = 0.0
+        else:
+            quantity = float(quantity.decode())
+        return quantity
+
+    def update_position(self, coin: str, delta: float):
+        quantity = self.get_position(coin)
+        self.__redis.hset(Constants.REDIS_KEY_BIT_Z_POSITIONS, coin, quantity + delta)
 
     def order(self, order_type, coin, price, number):
         # type: (str, str, str, str) -> str
@@ -44,6 +61,16 @@ class BitZTrade(object):
                 'created': time.time(),
                 'status': Constants.ORDER_STATUS_NEW
             })
+
+            trade_pair = extract_symbol(coin)
+            exchange_coin = trade_pair[0]
+            base_coin = trade_pair[1]
+            if order_type == 'in':
+                base_coin_delta = -1 * float(price) * float(number)
+                self.update_position(base_coin, base_coin_delta)
+            else:
+                exchange_coin_delta = -1 * float(number)
+                self.update_position(exchange_coin, exchange_coin_delta)
             return order_id
         print(result)
         return None

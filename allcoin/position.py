@@ -61,6 +61,11 @@ class AllCoinPosition(Position):
     def get_orders_info(self, symbol: str, order_ids: str) -> dict:
         params = {'api_key': self.__api_key, 'symbol': symbol, 'type': '0', 'order_id': order_ids}
         params['sign'] = build_all_coin_sign(params, self.__secret_key)
+        # {'result': True, 'order': [
+        #     {'amount': 1046.0, 'deal_amount': 0.0, 'avg_price': 0.0, 'order_id': 60119534, 'create_data': 1517274712768,
+        #      'price': 3e-07, 'status': 0, 'symbol': 'oc_btc', 'type': 'buy'},
+        #     {'amount': 1046.0, 'deal_amount': 0.0, 'avg_price': 0.0, 'order_id': 60119539, 'create_data': 1517274717502,
+        #      'price': 3e-07, 'status': 0, 'symbol': 'oc_btc', 'type': 'buy'}]}
         open_orders = http_post(self.__url + AllCoinPosition.ORDERS_INFO_RESOURCE, params, verify=False)
 
         params = {'api_key': self.__api_key, 'symbol': symbol, 'type': '1', 'order_id': order_ids}
@@ -69,15 +74,15 @@ class AllCoinPosition(Position):
 
         orders = {}
         if close_orders['result']:
-            for close_order in close_orders['orders']:
+            for close_order in close_orders['order']:
                 order = AllCoinOrder(close_order)
                 orders[order.get_order_id()] = order
 
         if open_orders['result']:
-            for open_order in open_orders['orders']:
+            for open_order in open_orders['order']:
                 if open_order['order_id'] not in orders:
                     order = AllCoinOrder(open_order)
-                    orders[order.order.get_order_id()] = order
+                    orders[order.get_order_id()] = order
 
         return orders
 

@@ -17,7 +17,7 @@ class BitZHelper(object):
     @staticmethod
     def get_response_status(status: str, quantity: float, filled_quantity: float) -> int:
         if status == '0':
-            return Constants.ORDER_STATUS_FILLED
+            return Constants.ORDER_STATUS_NEW
         if abs(quantity - filled_quantity) < 0.000000001:
             return Constants.ORDER_STATUS_FILLED
         if filled_quantity < 0.000000001:

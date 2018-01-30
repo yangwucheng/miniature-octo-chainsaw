@@ -49,7 +49,7 @@ class BitZSettlement(Settlement):
                 'max_fee': 9999999.0,
                 'min_price': 0.0,
                 'max_price': 9999999.0,
-                'min_quantity': 100.00,
+                'min_quantity': 1000.00,
                 'max_quantity': 500000000.00
             }
         }
@@ -62,7 +62,7 @@ class BitZSettlement(Settlement):
             'max_fee': 9999999.0,
             'min_price': 0.0,
             'max_price': 9999999.0,
-            'min_quantity': 100.00,
+            'min_quantity': 1000.00,
             'max_quantity': 500000000.00
         }
 
@@ -75,7 +75,7 @@ class BitZSettlement(Settlement):
                 'max_fee': 9999999.0,
                 'min_price': 0.0,
                 'max_price': 9999999.0,
-                'min_quantity': 100.00,
+                'min_quantity': 1000.00,
                 'max_quantity': 500000000.00
             }
         }
@@ -88,7 +88,7 @@ class BitZSettlement(Settlement):
             'max_fee': 9999999.0,
             'min_price': 0.0,
             'max_price': 9999999.0,
-            'min_quantity': 100.00,
+            'min_quantity': 1000.00,
             'max_quantity': 500000000.00
         }
 

@@ -7,7 +7,7 @@ class AllCoinOrder(Order):
     def __init__(self, order_dict):
         super(AllCoinOrder, self).__init__(
             exchange=Constants.EXCHANGE_NAME_ALL_COIN,
-            order_id=order_dict['order_id'],
+            order_id=str(order_dict['order_id']),
             order_type=AllCoinHelper.get_order_type(order_dict['type']),
             symbol=order_dict['symbol'],
             price=order_dict['price'],
