@@ -23,6 +23,7 @@ def build_all_coin_sign(params, secret_key):
 
 
 def http_get(url, verify=True):
+    requests.packages.urllib3.disable_warnings()
     return requests.get(url, verify=verify).json()
 
 
