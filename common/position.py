@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 import redis
 
+from common.order import Order
 from constants import Constants
 from utils import extract_symbol
 
@@ -46,9 +47,74 @@ class Position(object):
         quantity = self.get_position(coin)
         self.__redis.hset(self.__position_redis_key, coin, quantity + delta)
 
+    @abstractmethod
+    def get_order_from_redis(self, symbol: str, order_id: str) -> Order:
+        pass
+
+    def get_sell_quantity(self, symbol: str) -> float:
+        sell_quantity = self.__redis.get(Constants.REDIS_KEY_SELL_QUANTITY_PREFIX + ':' + symbol)
+        if sell_quantity is None:
+            return 0.0
+        return float(sell_quantity.decode())
+
+    def update_sell_quantity(self, symbol: str, delta: float):
+        old_sell_quantity = self.get_sell_quantity(symbol)
+        self.__redis.set(Constants.REDIS_KEY_SELL_QUANTITY_PREFIX + ':' + symbol, old_sell_quantity + delta)
+
+    def get_buy_quantity(self, symbol: str) -> float:
+        buy_quantity = self.__redis.get(Constants.REDIS_KEY_BUY_QUANTITY_PREFIX + ':' + symbol)
+        if buy_quantity is None:
+            return 0.0
+        return float(buy_quantity.decode())
+
+    def update_buy_quantity(self, symbol: str, delta: float):
+        old_buy_quantity = self.get_buy_quantity(symbol)
+        self.__redis.set(Constants.REDIS_KEY_BUY_QUANTITY_PREFIX + ':' + symbol, old_buy_quantity + delta)
+
+    def get_buy_price(self, symbol: str) -> float:
+        buy_price = self.__redis.get(Constants.REDIS_KEY_BUY_PRICE_PREFIX + ':' + symbol)
+        if buy_price is None:
+            return 0.0
+        return float(buy_price.decode())
+
+    def update_buy_price(self, symbol: str, filled_quantity: float, avg_price: float, old_filled_quantity: float,
+                         old_avg_price: float):
+        old_buy_price = self.get_buy_price(symbol)
+        old_buy_quantity = self.get_buy_quantity(symbol)
+
+        if (old_buy_quantity - old_filled_quantity + filled_quantity) > 0.00000001:
+            buy_price = (
+                        old_buy_price * old_buy_quantity - old_filled_quantity * old_avg_price + filled_quantity * avg_price) \
+                        / (old_buy_quantity - old_filled_quantity + filled_quantity)
+        else:
+            buy_price = avg_price
+
+        self.__redis.set(Constants.REDIS_KEY_BUY_PRICE_PREFIX + ':' + symbol, buy_price)
+
+    def get_sell_price(self, symbol: str) -> float:
+        sell_price = self.__redis.get(Constants.REDIS_KEY_SELL_PRICE_PREFIX + ':' + symbol)
+        if sell_price is None:
+            return 0.0
+        return float(sell_price.decode())
+
+    def update_sell_price(self, symbol: str, filled_quantity: float, avg_price: float, old_filled_quantity: float,
+                          old_avg_price: float):
+        old_sell_price = self.get_sell_price(symbol)
+        old_sell_quantity = self.get_sell_quantity(symbol)
+
+        if (old_sell_quantity - old_filled_quantity + filled_quantity) > 0.00000001:
+            sell_price = (
+                             old_sell_price * old_sell_quantity - old_filled_quantity * old_avg_price + filled_quantity * avg_price) \
+                         / (old_sell_quantity - old_filled_quantity + filled_quantity)
+        else:
+            sell_price = avg_price
+
+        self.__redis.set(Constants.REDIS_KEY_SELL_PRICE_PREFIX + ':' + symbol, sell_price)
+
     def run(self):
         symbols = self.__redis.smembers(self.__trade_pair_redis_key)
         symbols = [x.decode() for x in symbols]
+        open_orders_by_symbol = {}
 
         for symbol in symbols:
             open_order_ids = self.__redis.smembers(self.__open_order_redis_key_prefix + ':' + symbol)
@@ -64,6 +130,12 @@ class Position(object):
                 avg_price = order.get_avg_price()
                 fee = order.get_fee()
                 status = order.get_status()
+
+                old_order = self.get_order_from_redis(symbol, order_id)
+                old_filled_quantity = old_order.get_filled_quantity()
+                old_avg_price = old_order.get_avg_price()
+                old_fee = old_order.get_fee()
+
                 self.__redis.hmset(self.__order_redis_key_prefix + ':' + symbol + ':' + order_id, {
                     'order_id': order_id,
                     'avg_price': avg_price,
@@ -72,10 +144,18 @@ class Position(object):
                     'status': status
                 })
 
+                trade_pair = extract_symbol(symbol)
+                exchange_coin = trade_pair[0]
+                base_coin = trade_pair[1]
+
+                if order.is_buy():
+                    self.update_buy_price(symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price)
+                    self.update_buy_quantity(symbol, filled_quantity - old_filled_quantity)
+                else:
+                    self.update_sell_price(symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price)
+                    self.update_sell_quantity(symbol, filled_quantity - old_filled_quantity)
+
                 if status == Constants.ORDER_STATUS_FILLED or status == Constants.ORDER_STATUS_CANCELLED:
-                    trade_pair = extract_symbol(symbol)
-                    exchange_coin = trade_pair[0]
-                    base_coin = trade_pair[1]
                     if order.is_buy():
                         exchange_coin_delta = -1 * (fee / avg_price)
                         exchange_coin_delta += filled_quantity
@@ -97,7 +177,13 @@ class Position(object):
 
                     self.update_position(exchange_coin, exchange_coin_delta)
                     self.update_position(base_coin, base_coin_delta)
+                else:
+                    if symbol not in open_orders_by_symbol:
+                        open_orders_by_symbol[symbol] = []
+                    open_orders_by_symbol[symbol].append(order)
 
             for order_id in cancelled_order_ids:
                 self.__redis.srem(self.__cancelled_order_redis_key_prefix + ':' + symbol, order_id)
                 self.__redis.sadd(self.__closed_order_redis_key_prefix + ':' + symbol, order_id)
+
+        return open_orders_by_symbol

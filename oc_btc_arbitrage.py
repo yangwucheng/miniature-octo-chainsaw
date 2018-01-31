@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     bit_z_settlement = BitZSettlement()
 
-    remain_amount = 5000.0
+    remain_amount = 53000.0
 
     symbol = 'oc_btc'
     min_amount = all_coin_settlement.get_min_buy_quantity(symbol)

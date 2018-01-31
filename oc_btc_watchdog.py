@@ -2,7 +2,6 @@ import configparser
 import tkinter.messagebox
 
 from allcoin.market import AllCoinMarket
-from allcoin.trade import AllCoinTrade
 from bitz.market import BitZMarket
 
 if __name__ == '__main__':

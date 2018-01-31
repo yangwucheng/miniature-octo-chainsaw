@@ -55,6 +55,7 @@ class BitZTrade(object):
                 'order_type': BitZHelper.get_order_type(order_type),
                 'symbol': coin,
                 'order_price': price,
+                'avg_price': price,
                 'quantity': number,
                 'filled_quantity': 0.0,
                 'fee': 0.0,

@@ -38,7 +38,7 @@ class BitZOrder(Order):
                 order_type=int(temp_dict['order_type']),
                 symbol=symbol,
                 price=float(temp_dict['order_price']),
-                avg_price=float(temp_dict['order_price']),
+                avg_price=float(temp_dict['avg_price']),
                 quantity=float(temp_dict['quantity']),
                 filled_quantity=float(temp_dict['filled_quantity']),
                 status=int(temp_dict['status'])

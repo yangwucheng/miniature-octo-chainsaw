@@ -60,6 +60,7 @@ class AllCoinTrade(object):
                 'order_type': AllCoinHelper.get_order_type(order_type),
                 'symbol': symbol,
                 'order_price': price,
+                'avg_price': price,
                 'quantity': amount,
                 'filled_quantity': 0.0,
                 'fee': 0.0,

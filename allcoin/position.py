@@ -1,9 +1,16 @@
+import redis
+
 from allcoin.order import AllCoinOrder
 from common.position import Position
+from constants import Constants
 from utils import build_all_coin_sign, http_post
 
 
 class AllCoinPosition(Position):
+    def get_order_from_redis(self, symbol, order_id):
+        order_dict = self.__redis.hgetall(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id)
+        return AllCoinOrder(symbol=symbol, order_redis_dict=order_dict)
+
     OPEN_ORDERS_RESOURCE = '/api/v1/order_history'
     ORDERS_INFO_RESOURCE = '/api/v1/orders_info'
 
@@ -31,6 +38,7 @@ class AllCoinPosition(Position):
         self.__url = url
         self.__api_key = api_key
         self.__secret_key = secret_key
+        self.__redis = redis.StrictRedis()
 
     def get_open_orders(self, symbol):
         """
