@@ -26,7 +26,7 @@ all_coin_secret_key = config['allcoin']['secret_key']
 all_coin_position = AllCoinPosition(
     init_positions={
         'oc': 0.0,
-        'btc': 0.08604735
+        'btc': 0.12158900
     },
     position_redis_key=Constants.REDIS_KEY_ALL_COIN_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX,
@@ -47,8 +47,8 @@ bit_z_secret_key = config['bitz']['secret_key']
 # bit z position manager
 bit_z_position = BitZPosition(
     init_positions={
-        'oc': 45454.49000000,
-        'btc': 0.0
+        'oc': 98485.67,
+        'btc': 0.00002484
     },
     position_redis_key=Constants.REDIS_KEY_BIT_Z_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX,
@@ -99,59 +99,6 @@ bit_z_trade_pwd = config['bitz']['trade_pwd']
 bit_z_trade = BitZTrade(bit_z_trade_url, bit_z_api_key, bit_z_secret_key, bit_z_trade_pwd)
 
 while True:
-    bit_z_open_orders = bit_z_position.run()
-    all_coin_open_orders = all_coin_position.run()
+    bit_z_position.run()
+    all_coin_position.run()
 
-    oc_btc_buy_quantity = bit_z_position.get_buy_quantity(oc_btc_symbol)
-    oc_btc_buy_price = bit_z_position.get_buy_quantity(oc_btc_symbol)
-    oc_btc_sell_quantity = bit_z_position.get_sell_quantity(oc_btc_symbol)
-    oc_btc_sell_price = bit_z_position.get_sell_price(oc_btc_symbol)
-
-    delta = oc_btc_buy_quantity - oc_btc_sell_quantity
-    feed = 0
-
-    if oc_btc_symbol in bit_z_open_orders:
-        for order in bit_z_open_orders[oc_btc_symbol]:
-            if order.is_buy():
-                if delta > 0:
-                    bit_z_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                elif delta < 0:
-                    if feed >= -1 * delta:
-                        bit_z_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                    else:
-                        feed += order.get_quantity() - order.get_filled_quantity()
-                else:
-                    bit_z_trade.cancel_order(order.get_symbol(), order.get_order_id())
-            else:
-                if delta < 0:
-                    bit_z_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                elif delta > 0:
-                    if feed >= delta:
-                        bit_z_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                    else:
-                        feed += order.get_quantity() - order.get_filled_quantity()
-                else:
-                    bit_z_trade.cancel_order(order.get_symbol(), order.get_order_id())
-
-    if oc_btc_symbol in all_coin_open_orders:
-        for order in all_coin_open_orders[oc_btc_symbol]:
-            if order.is_buy():
-                if delta > 0:
-                    all_coin_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                elif delta < 0:
-                    if feed >= -1 * delta:
-                        all_coin_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                    else:
-                        feed += order.get_quantity() - order.get_filled_quantity()
-                else:
-                    all_coin_trade.cancel_order(order.get_symbol(), order.get_order_id())
-            else:
-                if delta < 0:
-                    all_coin_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                elif delta > 0:
-                    if feed >= delta:
-                        all_coin_trade.cancel_order(order.get_symbol(), order.get_order_id())
-                    else:
-                        feed += order.get_quantity() - order.get_filled_quantity()
-                else:
-                    all_coin_trade.cancel_order(order.get_symbol(), order.get_order_id())

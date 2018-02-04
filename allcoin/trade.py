@@ -35,6 +35,7 @@ class AllCoinTrade(object):
     def update_position(self, coin: str, delta: float):
         quantity = self.get_position(coin)
         self.__redis.hset(Constants.REDIS_KEY_ALL_COIN_POSITIONS, coin, quantity + delta)
+        print("all coin update position %.8f" % delta)
 
     def order(self, order_type, symbol, price, amount):
         # type: (str, str, str, str) -> str

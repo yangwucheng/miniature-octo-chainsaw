@@ -40,6 +40,18 @@ class BitZMarket(object):
         params = 'coin=%(coin)s' % {'coin': coin}
         return http_get(self.__url + BitZMarket.DEPTH_RESOURCE + '?' + params)
 
+    def oc_btc_asks(self):
+        """
+
+        :return:
+            "asks": [
+                ['0.00000210', '12867.7080'], # ask_3
+                ['0.00000209', '123770.4725'], # ask_2
+                ['0.00000208', '162688.6625'] # ask_1
+            ], //asks 委卖单[价格, 委单量]，价格从高到低排序 [str, str]
+        """
+        return self.depth('oc_btc')['data']['asks']
+
     def oc_btc_bids(self):
         # type: () -> list
         """

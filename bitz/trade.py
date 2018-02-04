@@ -37,6 +37,7 @@ class BitZTrade(object):
     def update_position(self, coin: str, delta: float):
         quantity = self.get_position(coin)
         self.__redis.hset(Constants.REDIS_KEY_BIT_Z_POSITIONS, coin, quantity + delta)
+        print("bit z update position %.8f" % delta)
 
     def order(self, order_type, coin, price, number):
         # type: (str, str, str, str) -> str

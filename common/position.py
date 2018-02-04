@@ -13,7 +13,8 @@ class Position(object):
                  order_redis_key_prefix: str, trade_pair_redis_key: str):
         self.__redis = redis.StrictRedis()
         self.__position_redis_key = position_redis_key
-        self.__redis.hmset(position_redis_key, init_positions)
+        if init_positions is not None:
+            self.__redis.hmset(position_redis_key, init_positions)
         self.__open_order_redis_key_prefix = open_order_redis_key_prefix
         self.__cancelled_order_redis_key_prefix = cancelled_order_redis_key_prefix
         self.__closed_order_redis_key_prefix = closed_order_redis_key_prefix
@@ -150,7 +151,7 @@ class Position(object):
 
                 if order.is_buy():
                     self.update_buy_price(symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price)
-                    self.update_buy_quantity(symbol, filled_quantity - old_filled_quantity)
+                    self.update_buy_quantity(symbol,  filled_quantity - old_filled_quantity)
                 else:
                     self.update_sell_price(symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price)
                     self.update_sell_quantity(symbol, filled_quantity - old_filled_quantity)
@@ -164,14 +165,14 @@ class Position(object):
                             # base coin has already update when create order
                             base_coin_delta = 0.0
                         else:
-                            base_coin_delta = avg_price * (quantity - filled_quantity)
+                            base_coin_delta = avg_price * (filled_quantity - quantity)
                     else:
                         if status == Constants.ORDER_STATUS_FILLED:
                             # exchange_coin_delta = -1 * filled_quantity
                             # exchange coin has already update when create order
                             exchange_coin_delta = 0.0
                         else:
-                            exchange_coin_delta = quantity - filled_quantity
+                            exchange_coin_delta = filled_quantity - quantity
                         base_coin_delta = -1 * fee
                         base_coin_delta += avg_price * filled_quantity
 
