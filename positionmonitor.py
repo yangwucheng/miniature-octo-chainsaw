@@ -26,8 +26,8 @@ all_coin_secret_key = config['allcoin']['secret_key']
 # all coin position manager
 all_coin_position = AllCoinPosition(
     init_positions={
-        'oc': 0.0,
-        'btc': 0.12158900
+        'oc': 33178.00,
+        'btc': 0.09247294
     },
     position_redis_key=Constants.REDIS_KEY_ALL_COIN_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX,
@@ -48,8 +48,8 @@ bit_z_secret_key = config['bitz']['secret_key']
 # bit z position manager
 bit_z_position = BitZPosition(
     init_positions={
-        'oc': 98485.67,
-        'btc': 0.00002484
+        'oc': 64706.67,
+        'btc': 0.03162183
     },
     position_redis_key=Constants.REDIS_KEY_BIT_Z_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX,
@@ -105,4 +105,3 @@ while True:
         all_coin_position.run()
     except Exception as e:
         traceback.print_exc()
-

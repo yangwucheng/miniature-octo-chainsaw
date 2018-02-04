@@ -32,6 +32,7 @@ def http_post(url, params, verify=True):
         "Content-type": "application/x-www-form-urlencoded",
     }
     temp_params = urllib.parse.urlencode(params)
+    requests.packages.urllib3.disable_warnings()
     r = requests.post(url, temp_params, headers=headers, verify=verify)
     return r.json()
 

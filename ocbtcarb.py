@@ -48,6 +48,9 @@ def all_coin_buy_bit_z_sell():
     sell_price = best_price_volume[2]
     sell_volume = best_price_volume[3]
 
+    if buy_price is None or sell_price is None:
+        return False
+
     bit_z_oc_position = bit_z_position.get_position('oc')
     all_coin_corresponding_oc_position = all_coin_position.get_position('btc') / buy_price
     if bit_z_oc_position < 1000.0 or all_coin_corresponding_oc_position < 1000.0:
@@ -108,6 +111,8 @@ def bit_z_buy_all_coin_sell():
     buy_volume = best_price_volume[1]
     sell_price = best_price_volume[2]
     sell_volume = best_price_volume[3]
+    if buy_price is None or sell_price is None:
+        return False
 
     all_coin_oc_position = all_coin_position.get_position('oc')
     bit_z_corresponding_oc_position = bit_z_position.get_position('btc') / buy_price
