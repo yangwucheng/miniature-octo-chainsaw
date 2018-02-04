@@ -1,4 +1,5 @@
 import configparser
+import traceback
 
 import redis
 
@@ -99,6 +100,9 @@ bit_z_trade_pwd = config['bitz']['trade_pwd']
 bit_z_trade = BitZTrade(bit_z_trade_url, bit_z_api_key, bit_z_secret_key, bit_z_trade_pwd)
 
 while True:
-    bit_z_position.run()
-    all_coin_position.run()
+    try:
+        bit_z_position.run()
+        all_coin_position.run()
+    except Exception as e:
+        traceback.print_exc()
 

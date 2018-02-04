@@ -1,4 +1,5 @@
 import configparser
+import traceback
 
 from allcoin.market import AllCoinMarket
 from allcoin.position import AllCoinPosition
@@ -218,4 +219,4 @@ if __name__ == '__main__':
             if not all_coin_buy_bit_z_sell():
                 bit_z_buy_all_coin_sell()
         except Exception as e:
-            print(e)
+            traceback.print_exc()
