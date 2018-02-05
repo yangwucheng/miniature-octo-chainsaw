@@ -18,6 +18,16 @@ class BitZHelper(object):
     def get_response_status(status: str, quantity: float, filled_quantity: float) -> int:
         if status == '0':
             return Constants.ORDER_STATUS_NEW
+
+        if status == '1':
+            return Constants.ORDER_STATUS_PARTIALLY_FILLED
+
+        if status == '2':
+            return Constants.ORDER_STATUS_FILLED
+
+        if status == '3':
+            return Constants.ORDER_STATUS_CANCELLED
+
         if abs(quantity - filled_quantity) < 0.000000001:
             return Constants.ORDER_STATUS_FILLED
         if filled_quantity < 0.000000001:

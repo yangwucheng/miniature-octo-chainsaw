@@ -22,6 +22,8 @@ class AllCoinPosition(Position):
                  closed_order_redis_key_prefix,
                  order_redis_key_prefix,
                  trade_pair_redis_key,
+                 market_buy_redis_key_prefix,
+                 market_sell_redis_key_prefix,
                  url,
                  api_key,
                  secret_key
@@ -33,7 +35,9 @@ class AllCoinPosition(Position):
             cancelled_order_redis_key_prefix=cancelled_order_redis_key_prefix,
             closed_order_redis_key_prefix=closed_order_redis_key_prefix,
             order_redis_key_prefix=order_redis_key_prefix,
-            trade_pair_redis_key=trade_pair_redis_key
+            trade_pair_redis_key=trade_pair_redis_key,
+            market_buy_redis_key_prefix=market_buy_redis_key_prefix,
+            market_sell_redis_key_prefix=market_sell_redis_key_prefix
         )
         self.__url = url
         self.__api_key = api_key

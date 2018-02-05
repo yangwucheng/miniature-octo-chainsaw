@@ -11,7 +11,8 @@ from utils import extract_symbol
 class Position(object):
     def __init__(self, init_positions: dict, position_redis_key: str, open_order_redis_key_prefix: str,
                  cancelled_order_redis_key_prefix: str, closed_order_redis_key_prefix: str,
-                 order_redis_key_prefix: str, trade_pair_redis_key: str):
+                 order_redis_key_prefix: str, trade_pair_redis_key: str, market_buy_redis_key_prefix: str,
+                 market_sell_redis_key_prefix: str):
         self.__redis = redis.StrictRedis()
         self.__position_redis_key = position_redis_key
         if init_positions is not None:
@@ -21,7 +22,8 @@ class Position(object):
         self.__closed_order_redis_key_prefix = closed_order_redis_key_prefix
         self.__order_redis_key_prefix = order_redis_key_prefix
         self.__trade_pair_redis_key = trade_pair_redis_key
-        self.__logger = logging.getLogger(__name__)
+        self.__market_buy_redis_key_prefix = market_buy_redis_key_prefix
+        self.__market_sell_redis_key_prefix = market_sell_redis_key_prefix
 
     @abstractmethod
     def get_orders(self, symbol: str, order_ids: list) -> list:
@@ -87,7 +89,7 @@ class Position(object):
 
         if (old_buy_quantity - old_filled_quantity + filled_quantity) > 0.00000001:
             buy_price = (
-                                old_buy_price * old_buy_quantity - old_filled_quantity * old_avg_price + filled_quantity * avg_price) \
+                            old_buy_price * old_buy_quantity - old_filled_quantity * old_avg_price + filled_quantity * avg_price) \
                         / (old_buy_quantity - old_filled_quantity + filled_quantity)
         else:
             buy_price = avg_price
@@ -113,6 +115,26 @@ class Position(object):
             sell_price = avg_price
 
         self.__redis.set(Constants.REDIS_KEY_SELL_PRICE_PREFIX + ':' + symbol, sell_price)
+
+    def get_market_buy_quantity(self, symbol: str):
+        market_buy_quantity = self.__redis.get(self.__market_buy_redis_key_prefix + ':' + symbol)
+        if market_buy_quantity is None:
+            return 0.0
+        return float(market_buy_quantity.decode())
+
+    def update_market_buy_quantity(self, symbol: str, delta: float):
+        old_market_buy_quantity = self.get_market_buy_quantity(symbol)
+        self.__redis.set(self.__market_buy_redis_key_prefix + ':' + symbol, old_market_buy_quantity + delta)
+
+    def get_market_sell_quantity(self, symbol: str):
+        market_sell_quantity = self.__redis.get(self.__market_sell_redis_key_prefix + ':' + symbol)
+        if market_sell_quantity is None:
+            return 0.0
+        return float(market_sell_quantity.decode())
+
+    def update_market_sell_quantity(self, symbol: str, delta: float):
+        old_market_sell_quantity = self.get_market_sell_quantity(symbol)
+        self.__redis.set(self.__market_sell_redis_key_prefix + ':' + symbol, old_market_sell_quantity + delta)
 
     def run(self):
         symbols = self.__redis.smembers(self.__trade_pair_redis_key)
@@ -164,6 +186,8 @@ class Position(object):
                     self.__logger.info('update buy quantity (%s, %.8f) when get order (%s)',
                                        symbol, filled_quantity - old_filled_quantity, order_id)
                     self.update_buy_quantity(symbol, filled_quantity - old_filled_quantity)
+
+                    self.update_market_buy_quantity(symbol, old_filled_quantity - filled_quantity)
                 else:
                     self.__logger.info('update sell price (%s, %.8f, %.8f, %.8f, %.8f) when get order (%s)',
                                        symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price, order_id)
@@ -171,6 +195,8 @@ class Position(object):
                     self.__logger.info('update sell quantity (%s, %.8f) when get order (%s)',
                                        symbol, filled_quantity - old_filled_quantity, order_id)
                     self.update_sell_quantity(symbol, filled_quantity - old_filled_quantity)
+
+                    self.update_market_sell_quantity(symbol, old_filled_quantity - filled_quantity)
 
                 if status == Constants.ORDER_STATUS_FILLED or status == Constants.ORDER_STATUS_CANCELLED:
                     if order.is_buy():
@@ -181,14 +207,14 @@ class Position(object):
                             # base coin has already update when create order
                             base_coin_delta = 0.0
                         else:
-                            base_coin_delta = avg_price * (filled_quantity - quantity)
+                            base_coin_delta = avg_price * (quantity - filled_quantity)
                     else:
                         if status == Constants.ORDER_STATUS_FILLED:
                             # exchange_coin_delta = -1 * filled_quantity
                             # exchange coin has already update when create order
                             exchange_coin_delta = 0.0
                         else:
-                            exchange_coin_delta = filled_quantity - quantity
+                            exchange_coin_delta = quantity - filled_quantity
                         base_coin_delta = -1 * fee
                         base_coin_delta += avg_price * filled_quantity
 

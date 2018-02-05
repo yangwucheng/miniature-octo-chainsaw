@@ -183,6 +183,8 @@ if __name__ == '__main__':
         closed_order_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_CLOSED_ORDER_IDS_PREFIX,
         order_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX,
         trade_pair_redis_key=Constants.REDIS_KEY_ALL_COIN_TRADE_PAIRS,
+        market_buy_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_MARKET_BUY_PREFIX,
+        market_sell_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_MARKET_SELL_PREFIX,
         url=all_coin_trade_url,
         api_key=all_coin_api_key,
         secret_key=all_coin_secret_key
@@ -197,6 +199,8 @@ if __name__ == '__main__':
         closed_order_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_CLOSED_ORDER_IDS_PREFIX,
         order_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_ORDER_PREFIX,
         trade_pair_redis_key=Constants.REDIS_KEY_BIT_Z_TRADE_PAIRS,
+        market_buy_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_MARKET_BUY_PREFIX,
+        market_sell_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_MARKET_SELL_PREFIX,
         url=bit_z_trade_url,
         api_key=bit_z_api_key,
         secret_key=bit_z_secret_key

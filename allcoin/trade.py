@@ -12,6 +12,7 @@ class AllCoinTrade(object):
     ORDER_RESOURCE = '/api/v1/trade'
     CANCEL_RESOURCE = '/api/v1/cancel_order'
     OPEN_ORDERS_RESOURCE = '/api/v1/order_history'
+    ORDER_INFO_RESOURCE = '/api/v1/order_info'
 
     def __init__(self, url, api_key, secret_key):
         # type: (str, str, str) -> None
@@ -37,6 +38,27 @@ class AllCoinTrade(object):
     def update_position(self, coin: str, delta: float):
         quantity = self.get_position(coin)
         self.__redis.hset(Constants.REDIS_KEY_ALL_COIN_POSITIONS, coin, quantity + delta)
+
+    def get_market_buy_quantity(self, symbol: str):
+        market_buy_quantity = self.__redis.get(Constants.REDIS_KEY_ALL_COIN_MARKET_BUY_PREFIX + ':' + symbol)
+        if market_buy_quantity is None:
+            return 0.0
+        return float(market_buy_quantity.decode())
+
+    def update_market_buy_quantity(self, symbol: str, delta: float):
+        old_market_buy_quantity = self.get_market_buy_quantity(symbol)
+        self.__redis.set(Constants.REDIS_KEY_ALL_COIN_MARKET_BUY_PREFIX + ':' + symbol, old_market_buy_quantity + delta)
+
+    def get_market_sell_quantity(self, symbol: str):
+        market_sell_quantity = self.__redis.get(Constants.REDIS_KEY_ALL_COIN_MARKET_SELL_PREFIX + ':' + symbol)
+        if market_sell_quantity is None:
+            return 0.0
+        return float(market_sell_quantity.decode())
+
+    def update_market_sell_quantity(self, symbol: str, delta: float):
+        old_market_sell_quantity = self.get_market_sell_quantity(symbol)
+        self.__redis.set(Constants.REDIS_KEY_ALL_COIN_MARKET_SELL_PREFIX + ':' + symbol,
+                         old_market_sell_quantity + delta)
 
     def order(self, order_type, symbol, price, amount):
         # type: (str, str, str, str) -> str
@@ -81,11 +103,13 @@ class AllCoinTrade(object):
                 self.__logger.info('update base coin(%s, %.8f) position when create buy order(%s)',
                                    base_coin, base_coin_delta, order_id)
                 self.update_position(base_coin, base_coin_delta)
+                self.update_market_buy_quantity(symbol, float(amount))
             else:
                 exchange_coin_delta = -1 * float(amount)
                 self.__logger.info('update exchange coin(%s, %.8f) position when create sell order(%s)',
                                    exchange_coin, exchange_coin_delta, order_id)
                 self.update_position(exchange_coin, exchange_coin_delta)
+                self.update_market_sell_quantity(symbol, float(amount))
             return order_id
         print(result)
         return None
@@ -153,3 +177,8 @@ class AllCoinTrade(object):
     def cancel_all_orders(self, symbol):
         open_orders = self.get_open_orders(symbol)
         self.cancel_orders(open_orders['order'])
+
+    def get_order_info(self, symbol, order_id):
+        params = {'api_key': self.__api_key, 'symbol': symbol, 'order_id': order_id}
+        params['sign'] = build_all_coin_sign(params, self.__secret_key)
+        return http_post(self.__url + AllCoinTrade.ORDER_INFO_RESOURCE, params, verify=False)

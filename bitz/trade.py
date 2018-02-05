@@ -41,6 +41,26 @@ class BitZTrade(object):
         self.__redis.hset(Constants.REDIS_KEY_BIT_Z_POSITIONS, coin, quantity + delta)
         print("bit z update position %.8f" % delta)
 
+    def get_market_buy_quantity(self, symbol: str):
+        market_buy_quantity = self.__redis.get(Constants.REDIS_KEY_BIT_Z_MARKET_BUY_PREFIX + ':' + symbol)
+        if market_buy_quantity is None:
+            return 0.0
+        return float(market_buy_quantity.decode())
+
+    def update_market_buy_quantity(self, symbol: str, delta: float):
+        old_market_buy_quantity = self.get_market_buy_quantity(symbol)
+        self.__redis.set(Constants.REDIS_KEY_BIT_Z_MARKET_BUY_PREFIX + ':' + symbol, old_market_buy_quantity + delta)
+
+    def get_market_sell_quantity(self, symbol: str):
+        market_sell_quantity = self.__redis.get(Constants.REDIS_KEY_BIT_Z_MARKET_SELL_PREFIX + ':' + symbol)
+        if market_sell_quantity is None:
+            return 0.0
+        return float(market_sell_quantity.decode())
+
+    def update_market_sell_quantity(self, symbol: str, delta: float):
+        old_market_sell_quantity = self.get_market_sell_quantity(symbol)
+        self.__redis.set(Constants.REDIS_KEY_BIT_Z_MARKET_SELL_PREFIX + ':' + symbol, old_market_sell_quantity + delta)
+
     def order(self, order_type, coin, price, number):
         # type: (str, str, str, str) -> str
         params = {'api_key': self.__api_key, 'timestamp': str(int(time.time())),
@@ -78,11 +98,13 @@ class BitZTrade(object):
                 self.__logger.info('update base coin(%s, %.8f) position when create buy order(%s)',
                                    base_coin, base_coin_delta, order_id)
                 self.update_position(base_coin, base_coin_delta)
+                self.update_market_buy_quantity(coin, float(number))
             else:
                 exchange_coin_delta = -1 * float(number)
                 self.__logger.info('update exchange coin(%s, %.8f) position when create sell order(%s)',
                                    exchange_coin, exchange_coin_delta, order_id)
                 self.update_position(exchange_coin, exchange_coin_delta)
+                self.update_market_sell_quantity(coin, float(number))
             return order_id
         print(result)
         return None
