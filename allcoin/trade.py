@@ -20,7 +20,9 @@ class AllCoinTrade(object):
         self.__api_key = api_key
         self.__secret_key = secret_key
         self.__redis = redis.StrictRedis()
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.DEBUG)
         self.__logger = logging.getLogger(__name__)
+        self.__logger.setLevel(logging.DEBUG)
 
     def get_position(self, coin: str) -> float:
         """
@@ -103,12 +105,16 @@ class AllCoinTrade(object):
                 self.__logger.info('update base coin(%s, %.8f) position when create buy order(%s)',
                                    base_coin, base_coin_delta, order_id)
                 self.update_position(base_coin, base_coin_delta)
+                self.__logger.info('update market buy quantity(%s, %s) position when create buy order(%s)',
+                                   symbol, amount, order_id)
                 self.update_market_buy_quantity(symbol, float(amount))
             else:
                 exchange_coin_delta = -1 * float(amount)
                 self.__logger.info('update exchange coin(%s, %.8f) position when create sell order(%s)',
                                    exchange_coin, exchange_coin_delta, order_id)
                 self.update_position(exchange_coin, exchange_coin_delta)
+                self.__logger.info('update market sell quantity(%s, %s) position when create sell order(%s)',
+                                   symbol, amount, order_id)
                 self.update_market_sell_quantity(symbol, float(amount))
             return order_id
         print(result)

@@ -21,7 +21,9 @@ class BitZTrade(object):
         self.__secret_key = secret_key
         self.__trade_pwd = trade_pwd
         self.__redis = redis.StrictRedis()
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.DEBUG)
         self.__logger = logging.getLogger(__name__)
+        self.__logger.setLevel(logging.DEBUG)
 
     def get_position(self, coin: str) -> float:
         """
@@ -41,7 +43,7 @@ class BitZTrade(object):
         self.__redis.hset(Constants.REDIS_KEY_BIT_Z_POSITIONS, coin, quantity + delta)
         print("bit z update position %.8f" % delta)
 
-    def get_market_buy_quantity(self, symbol: str):
+    def get_market_buy_quantity(self, symbol: str) -> float:
         market_buy_quantity = self.__redis.get(Constants.REDIS_KEY_BIT_Z_MARKET_BUY_PREFIX + ':' + symbol)
         if market_buy_quantity is None:
             return 0.0
@@ -51,7 +53,7 @@ class BitZTrade(object):
         old_market_buy_quantity = self.get_market_buy_quantity(symbol)
         self.__redis.set(Constants.REDIS_KEY_BIT_Z_MARKET_BUY_PREFIX + ':' + symbol, old_market_buy_quantity + delta)
 
-    def get_market_sell_quantity(self, symbol: str):
+    def get_market_sell_quantity(self, symbol: str) -> float:
         market_sell_quantity = self.__redis.get(Constants.REDIS_KEY_BIT_Z_MARKET_SELL_PREFIX + ':' + symbol)
         if market_sell_quantity is None:
             return 0.0
@@ -61,8 +63,7 @@ class BitZTrade(object):
         old_market_sell_quantity = self.get_market_sell_quantity(symbol)
         self.__redis.set(Constants.REDIS_KEY_BIT_Z_MARKET_SELL_PREFIX + ':' + symbol, old_market_sell_quantity + delta)
 
-    def order(self, order_type, coin, price, number):
-        # type: (str, str, str, str) -> str
+    def order(self, order_type: str, coin: str, price: str, number: str) -> str:
         params = {'api_key': self.__api_key, 'timestamp': str(int(time.time())),
                   'nonce': '%06d' % random.randint(0, 999999), 'coin': coin, 'type': order_type, 'price': price,
                   'number': number, 'tradepwd': self.__trade_pwd}
@@ -98,12 +99,16 @@ class BitZTrade(object):
                 self.__logger.info('update base coin(%s, %.8f) position when create buy order(%s)',
                                    base_coin, base_coin_delta, order_id)
                 self.update_position(base_coin, base_coin_delta)
+                self.__logger.info('update market buy quantity(%s, %s) when create buy order(%s)',
+                                   coin, number, order_id)
                 self.update_market_buy_quantity(coin, float(number))
             else:
                 exchange_coin_delta = -1 * float(number)
                 self.__logger.info('update exchange coin(%s, %.8f) position when create sell order(%s)',
                                    exchange_coin, exchange_coin_delta, order_id)
                 self.update_position(exchange_coin, exchange_coin_delta)
+                self.__logger.info('update market sell quantity(%s, %s) when create sell order(%s)',
+                                   coin, number, order_id)
                 self.update_market_sell_quantity(coin, float(number))
             return order_id
         print(result)

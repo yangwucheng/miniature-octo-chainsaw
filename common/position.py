@@ -24,6 +24,9 @@ class Position(object):
         self.__trade_pair_redis_key = trade_pair_redis_key
         self.__market_buy_redis_key_prefix = market_buy_redis_key_prefix
         self.__market_sell_redis_key_prefix = market_sell_redis_key_prefix
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.DEBUG)
+        self.__logger = logging.getLogger(__name__)
+        self.__logger.setLevel(logging.DEBUG)
 
     @abstractmethod
     def get_orders(self, symbol: str, order_ids: list) -> list:
@@ -109,7 +112,7 @@ class Position(object):
 
         if (old_sell_quantity - old_filled_quantity + filled_quantity) > 0.00000001:
             sell_price = (
-                                 old_sell_price * old_sell_quantity - old_filled_quantity * old_avg_price + filled_quantity * avg_price) \
+                             old_sell_price * old_sell_quantity - old_filled_quantity * old_avg_price + filled_quantity * avg_price) \
                          / (old_sell_quantity - old_filled_quantity + filled_quantity)
         else:
             sell_price = avg_price
@@ -187,6 +190,8 @@ class Position(object):
                                        symbol, filled_quantity - old_filled_quantity, order_id)
                     self.update_buy_quantity(symbol, filled_quantity - old_filled_quantity)
 
+                    self.__logger.info('update market buy quantity (%s, %.8f) when get order (%s)',
+                                       symbol, old_filled_quantity - filled_quantity, order_id)
                     self.update_market_buy_quantity(symbol, old_filled_quantity - filled_quantity)
                 else:
                     self.__logger.info('update sell price (%s, %.8f, %.8f, %.8f, %.8f) when get order (%s)',
@@ -196,6 +201,8 @@ class Position(object):
                                        symbol, filled_quantity - old_filled_quantity, order_id)
                     self.update_sell_quantity(symbol, filled_quantity - old_filled_quantity)
 
+                    self.__logger.info('update market sell quantity (%s, %.8f) when get order (%s)',
+                                       symbol, old_filled_quantity - filled_quantity, order_id)
                     self.update_market_sell_quantity(symbol, old_filled_quantity - filled_quantity)
 
                 if status == Constants.ORDER_STATUS_FILLED or status == Constants.ORDER_STATUS_CANCELLED:
