@@ -26,8 +26,8 @@ all_coin_secret_key = config['allcoin']['secret_key']
 # all coin position manager
 all_coin_position = AllCoinPosition(
     init_positions={
-        'oc': 33178.00,
-        'btc': 0.09247294
+        'oc': 81378.00,
+        'btc': 0.00000784
     },
     position_redis_key=Constants.REDIS_KEY_ALL_COIN_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX,
@@ -50,8 +50,8 @@ bit_z_secret_key = config['bitz']['secret_key']
 # bit z position manager
 bit_z_position = BitZPosition(
     init_positions={
-        'oc': 64706.67,
-        'btc': 0.03162183
+        'oc': 15975.37,
+        'btc': 0.12388983
     },
     position_redis_key=Constants.REDIS_KEY_BIT_Z_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX,

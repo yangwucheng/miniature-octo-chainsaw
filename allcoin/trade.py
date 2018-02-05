@@ -20,9 +20,9 @@ class AllCoinTrade(object):
         self.__api_key = api_key
         self.__secret_key = secret_key
         self.__redis = redis.StrictRedis()
-        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.DEBUG)
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.INFO)
         self.__logger = logging.getLogger(__name__)
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(logging.INFO)
 
     def get_position(self, coin: str) -> float:
         """

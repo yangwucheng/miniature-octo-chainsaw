@@ -24,9 +24,9 @@ class Position(object):
         self.__trade_pair_redis_key = trade_pair_redis_key
         self.__market_buy_redis_key_prefix = market_buy_redis_key_prefix
         self.__market_sell_redis_key_prefix = market_sell_redis_key_prefix
-        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.DEBUG)
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.INFO)
         self.__logger = logging.getLogger(__name__)
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(logging.INFO)
 
     @abstractmethod
     def get_orders(self, symbol: str, order_ids: list) -> list:
@@ -150,6 +150,9 @@ class Position(object):
             cancelled_order_ids = self.__redis.smembers(self.__cancelled_order_redis_key_prefix + ':' + symbol)
             cancelled_order_ids = set([x.decode() for x in cancelled_order_ids])
             order_ids = list(open_order_ids | cancelled_order_ids)
+            if len(order_ids) == 0:
+                continue
+
             orders = self.get_orders(symbol, order_ids)
             for order in orders:
                 order_id = order.get_order_id()

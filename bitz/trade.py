@@ -21,9 +21,9 @@ class BitZTrade(object):
         self.__secret_key = secret_key
         self.__trade_pwd = trade_pwd
         self.__redis = redis.StrictRedis()
-        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.DEBUG)
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.INFO)
         self.__logger = logging.getLogger(__name__)
-        self.__logger.setLevel(logging.DEBUG)
+        self.__logger.setLevel(logging.INFO)
 
     def get_position(self, coin: str) -> float:
         """
