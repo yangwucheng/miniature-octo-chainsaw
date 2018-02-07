@@ -20,9 +20,9 @@ class AllCoinTrade(object):
         self.__api_key = api_key
         self.__secret_key = secret_key
         self.__redis = redis.StrictRedis()
-        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.INFO)
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.ERROR)
         self.__logger = logging.getLogger(__name__)
-        self.__logger.setLevel(logging.INFO)
+        self.__logger.setLevel(logging.ERROR)
 
     def get_position(self, coin: str) -> float:
         """
@@ -80,9 +80,9 @@ class AllCoinTrade(object):
         result = http_post(self.__url + AllCoinTrade.ORDER_RESOURCE, params, verify=False)
         if result['result'] == 'true':
             order_id = result['order_id']
-            self.__logger.info('add order(%s) into open order ids when create', order_id)
+            self.__logger.error('add order(%s) into open order ids when create', order_id)
             self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX + ':' + symbol, order_id)
-            self.__logger.info('hmset order(%s, %d, %s, %.8f, %.8f) when create',
+            self.__logger.error('hmset order(%s, %d, %s, %.8f, %.8f) when create',
                                order_id, AllCoinHelper.get_order_type(order_type),
                                symbol, price, amount)
             self.__redis.hmset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, {
@@ -102,18 +102,18 @@ class AllCoinTrade(object):
             base_coin = trade_pair[1]
             if order_type == 'buy':
                 base_coin_delta = -1 * float(price) * float(amount)
-                self.__logger.info('update base coin(%s, %.8f) position when create buy order(%s)',
+                self.__logger.error('update base coin(%s, %.8f) position when create buy order(%s)',
                                    base_coin, base_coin_delta, order_id)
                 self.update_position(base_coin, base_coin_delta)
-                self.__logger.info('update market buy quantity(%s, %s) position when create buy order(%s)',
+                self.__logger.error('update market buy quantity(%s, %s) position when create buy order(%s)',
                                    symbol, amount, order_id)
                 self.update_market_buy_quantity(symbol, float(amount))
             else:
                 exchange_coin_delta = -1 * float(amount)
-                self.__logger.info('update exchange coin(%s, %.8f) position when create sell order(%s)',
+                self.__logger.error('update exchange coin(%s, %.8f) position when create sell order(%s)',
                                    exchange_coin, exchange_coin_delta, order_id)
                 self.update_position(exchange_coin, exchange_coin_delta)
-                self.__logger.info('update market sell quantity(%s, %s) position when create sell order(%s)',
+                self.__logger.error('update market sell quantity(%s, %s) position when create sell order(%s)',
                                    symbol, amount, order_id)
                 self.update_market_sell_quantity(symbol, float(amount))
             return order_id

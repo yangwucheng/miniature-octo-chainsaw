@@ -43,8 +43,8 @@ def all_coin_buy_bit_z_sell():
         return False
 
     if sell_price / buy_price > 1.02:
-        logger.info('all coin buy price %.8f quantity %.8f ', buy_price, buy_volume)
-        logger.info('bit z sell price %.8f quantity %.8f ', sell_price, sell_volume)
+        logger.error('all coin buy price %.8f quantity %.8f ', buy_price, buy_volume)
+        logger.error('bit z sell price %.8f quantity %.8f ', sell_price, sell_volume)
         tkinter.messagebox.showinfo("价差达到2%以上",
                                     'all coin buy price %.8f quantity %.8f \n bit z sell price %.8f quantity %.8f' %
                                     (buy_price, buy_volume, sell_price, sell_volume)
@@ -84,8 +84,8 @@ def bit_z_buy_all_coin_sell():
         return False
 
     if sell_price / buy_price > 1.02:
-        logger.info('bit z buy price %.8f quantity %.8f ', buy_price, buy_volume)
-        logger.info('all coin sell price %.8f quantity %.8f ', sell_price, sell_volume)
+        logger.error('bit z buy price %.8f quantity %.8f ', buy_price, buy_volume)
+        logger.error('all coin sell price %.8f quantity %.8f ', sell_price, sell_volume)
         tkinter.messagebox.showinfo("价差达到2%以上",
                                     'bit z buy price %.8f quantity %.8f \n all coin sell price %.8f quantity %.8f' %
                                     (buy_price, buy_volume, sell_price, sell_volume)

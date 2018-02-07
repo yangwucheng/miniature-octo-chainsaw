@@ -21,9 +21,9 @@ class BitZTrade(object):
         self.__secret_key = secret_key
         self.__trade_pwd = trade_pwd
         self.__redis = redis.StrictRedis()
-        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.INFO)
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.ERROR)
         self.__logger = logging.getLogger(__name__)
-        self.__logger.setLevel(logging.INFO)
+        self.__logger.setLevel(logging.ERROR)
 
     def get_position(self, coin: str) -> float:
         """
@@ -73,9 +73,9 @@ class BitZTrade(object):
         # print(result)
         if result['code'] == 0:
             order_id = result['data']['id']
-            self.__logger.info('add order(%s) into open order ids when create', order_id)
+            self.__logger.error('add order(%s) into open order ids when create', order_id)
             self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX + ':' + coin, order_id)
-            self.__logger.info('hmset order(%s, %d, %s, %.8f, %.8f) when create',
+            self.__logger.error('hmset order(%s, %d, %s, %.8f, %.8f) when create',
                                order_id, BitZHelper.get_order_type(order_type),
                                coin, price, number)
             self.__redis.hmset(Constants.REDIS_KEY_BIT_Z_ORDER_PREFIX + ':' + coin + ':' + order_id, {
@@ -96,18 +96,18 @@ class BitZTrade(object):
             base_coin = trade_pair[1]
             if order_type == 'in':
                 base_coin_delta = -1 * float(price) * float(number)
-                self.__logger.info('update base coin(%s, %.8f) position when create buy order(%s)',
+                self.__logger.error('update base coin(%s, %.8f) position when create buy order(%s)',
                                    base_coin, base_coin_delta, order_id)
                 self.update_position(base_coin, base_coin_delta)
-                self.__logger.info('update market buy quantity(%s, %s) when create buy order(%s)',
+                self.__logger.error('update market buy quantity(%s, %s) when create buy order(%s)',
                                    coin, number, order_id)
                 self.update_market_buy_quantity(coin, float(number))
             else:
                 exchange_coin_delta = -1 * float(number)
-                self.__logger.info('update exchange coin(%s, %.8f) position when create sell order(%s)',
+                self.__logger.error('update exchange coin(%s, %.8f) position when create sell order(%s)',
                                    exchange_coin, exchange_coin_delta, order_id)
                 self.update_position(exchange_coin, exchange_coin_delta)
-                self.__logger.info('update market sell quantity(%s, %s) when create sell order(%s)',
+                self.__logger.error('update market sell quantity(%s, %s) when create sell order(%s)',
                                    coin, number, order_id)
                 self.update_market_sell_quantity(coin, float(number))
             return order_id

@@ -24,9 +24,9 @@ class Position(object):
         self.__trade_pair_redis_key = trade_pair_redis_key
         self.__market_buy_redis_key_prefix = market_buy_redis_key_prefix
         self.__market_sell_redis_key_prefix = market_sell_redis_key_prefix
-        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.INFO)
+        logging.basicConfig(format='%(asctime)-15s %(name)-10s %(message)s', level=logging.ERROR)
         self.__logger = logging.getLogger(__name__)
-        self.__logger.setLevel(logging.INFO)
+        self.__logger.setLevel(logging.ERROR)
 
     @abstractmethod
     def get_orders(self, symbol: str, order_ids: list) -> list:
@@ -168,10 +168,10 @@ class Position(object):
                 old_fee = old_order.get_fee()
 
                 if order.get_status() == Constants.ORDER_STATUS_FILLED:
-                    self.__logger.info('remove order id %s from open order ids when order filled', order_id)
+                    self.__logger.error('remove order id %s from open order ids when order filled', order_id)
                     self.__redis.srem(self.__open_order_redis_key_prefix + ':' + symbol, order_id)
 
-                self.__logger.info('hmset order (%s, %.8f, %.8f, %.8f, %d) when get order',
+                self.__logger.error('hmset order (%s, %.8f, %.8f, %.8f, %d) when get order',
                                    order_id, avg_price, filled_quantity, fee, status)
                 self.__redis.hmset(self.__order_redis_key_prefix + ':' + symbol + ':' + order_id, {
                     'order_id': order_id,
@@ -186,25 +186,25 @@ class Position(object):
                 base_coin = trade_pair[1]
 
                 if order.is_buy():
-                    self.__logger.info('update buy price (%s, %.8f, %.8f, %.8f, %.8f) when get order (%s)',
+                    self.__logger.error('update buy price (%s, %.8f, %.8f, %.8f, %.8f) when get order (%s)',
                                        symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price, order_id)
                     self.update_buy_price(symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price)
-                    self.__logger.info('update buy quantity (%s, %.8f) when get order (%s)',
+                    self.__logger.error('update buy quantity (%s, %.8f) when get order (%s)',
                                        symbol, filled_quantity - old_filled_quantity, order_id)
                     self.update_buy_quantity(symbol, filled_quantity - old_filled_quantity)
 
-                    self.__logger.info('update market buy quantity (%s, %.8f) when get order (%s)',
+                    self.__logger.error('update market buy quantity (%s, %.8f) when get order (%s)',
                                        symbol, old_filled_quantity - filled_quantity, order_id)
                     self.update_market_buy_quantity(symbol, old_filled_quantity - filled_quantity)
                 else:
-                    self.__logger.info('update sell price (%s, %.8f, %.8f, %.8f, %.8f) when get order (%s)',
+                    self.__logger.error('update sell price (%s, %.8f, %.8f, %.8f, %.8f) when get order (%s)',
                                        symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price, order_id)
                     self.update_sell_price(symbol, filled_quantity, avg_price, old_filled_quantity, old_avg_price)
-                    self.__logger.info('update sell quantity (%s, %.8f) when get order (%s)',
+                    self.__logger.error('update sell quantity (%s, %.8f) when get order (%s)',
                                        symbol, filled_quantity - old_filled_quantity, order_id)
                     self.update_sell_quantity(symbol, filled_quantity - old_filled_quantity)
 
-                    self.__logger.info('update market sell quantity (%s, %.8f) when get order (%s)',
+                    self.__logger.error('update market sell quantity (%s, %.8f) when get order (%s)',
                                        symbol, old_filled_quantity - filled_quantity, order_id)
                     self.update_market_sell_quantity(symbol, old_filled_quantity - filled_quantity)
 
@@ -228,10 +228,10 @@ class Position(object):
                         base_coin_delta = -1 * fee
                         base_coin_delta += avg_price * filled_quantity
 
-                    self.__logger.info("update exchange coin(%s, %.8f) position when order(%s) finished",
+                    self.__logger.error("update exchange coin(%s, %.8f) position when order(%s) finished",
                                        exchange_coin, exchange_coin_delta, order_id)
                     self.update_position(exchange_coin, exchange_coin_delta)
-                    self.__logger.info("update base coin(%s, %.8f) position when order(%s) finished",
+                    self.__logger.error("update base coin(%s, %.8f) position when order(%s) finished",
                                        base_coin, base_coin_delta, order_id)
                     self.update_position(base_coin, base_coin_delta)
                 else:
@@ -240,10 +240,10 @@ class Position(object):
                     open_orders_by_symbol[symbol].append(order)
 
             for order_id in cancelled_order_ids:
-                self.__logger.info("remove order(%s) from cancelled orders when finish cancel",
+                self.__logger.error("remove order(%s) from cancelled orders when finish cancel",
                                    order_id)
                 self.__redis.srem(self.__cancelled_order_redis_key_prefix + ':' + symbol, order_id)
-                self.__logger.info("add order(%s) into closed orders when finish cancel",
+                self.__logger.error("add order(%s) into closed orders when finish cancel",
                                    order_id)
                 self.__redis.sadd(self.__closed_order_redis_key_prefix + ':' + symbol, order_id)
 
