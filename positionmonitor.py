@@ -27,8 +27,8 @@ all_coin_secret_key = config['allcoin']['secret_key']
 # all coin position manager
 all_coin_position = AllCoinPosition(
     init_positions={
-        'oc': 31368.23,
-        'btc': 0.07187797
+        'oc': 483.23,
+        'btc': 0.14197014
     },
     position_redis_key=Constants.REDIS_KEY_ALL_COIN_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX,
@@ -51,8 +51,8 @@ bit_z_secret_key = config['bitz']['secret_key']
 # bit z position manager
 bit_z_position = BitZPosition(
     init_positions={
-        'oc': 65984.36224870,
-        'btc': 0.05712377
+        'oc': 97786.26702460,
+        'btc': 0.01835223
     },
     position_redis_key=Constants.REDIS_KEY_BIT_Z_POSITIONS,
     open_order_redis_key_prefix=Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX,
@@ -111,8 +111,14 @@ bit_z_secret_key = config['bitz']['secret_key']
 bit_z_trade_pwd = config['bitz']['trade_pwd']
 bit_z_trade = BitZTrade(bit_z_trade_url, bit_z_api_key, bit_z_secret_key, bit_z_trade_pwd)
 
+ind = 0
 while True:
     try:
+        ind += 1
+        if ind % 500 == 0:
+            print("### position monitor running %d ###" % ind)
+        if ind == 1000:
+            ind = 0
         bit_z_position.run()
         all_coin_position.run()
         time.sleep(0.1)

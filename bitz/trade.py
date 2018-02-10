@@ -75,7 +75,7 @@ class BitZTrade(object):
             order_id = result['data']['id']
             self.__logger.error('add order(%s) into open order ids when create', order_id)
             self.__redis.sadd(Constants.REDIS_KEY_BIT_Z_OPEN_ORDER_IDS_PREFIX + ':' + coin, order_id)
-            self.__logger.error('hmset order(%s, %d, %s, %.8f, %.8f) when create',
+            self.__logger.error('hmset order(%s, %d, %s, %s, %s) when create',
                                order_id, BitZHelper.get_order_type(order_type),
                                coin, price, number)
             self.__redis.hmset(Constants.REDIS_KEY_BIT_Z_ORDER_PREFIX + ':' + coin + ':' + order_id, {

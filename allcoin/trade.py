@@ -82,7 +82,7 @@ class AllCoinTrade(object):
             order_id = result['order_id']
             self.__logger.error('add order(%s) into open order ids when create', order_id)
             self.__redis.sadd(Constants.REDIS_KEY_ALL_COIN_OPEN_ORDER_IDS_PREFIX + ':' + symbol, order_id)
-            self.__logger.error('hmset order(%s, %d, %s, %.8f, %.8f) when create',
+            self.__logger.error('hmset order(%s, %d, %s, %s, %s) when create',
                                order_id, AllCoinHelper.get_order_type(order_type),
                                symbol, price, amount)
             self.__redis.hmset(Constants.REDIS_KEY_ALL_COIN_ORDER_PREFIX + ':' + symbol + ':' + order_id, {

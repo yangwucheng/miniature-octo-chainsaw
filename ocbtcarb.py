@@ -71,7 +71,7 @@ def all_coin_buy_bit_z_sell():
     buy_fee = all_coin_settlement.calculate_buy_fee(symbol, buy_price, amount_float)
     sell_fee = bit_z_settlement.calculate_sell_fee(symbol, sell_price, amount_float)
     pnl = calculate_pnl(buy_price, sell_price, amount_float, buy_fee, sell_fee)
-    if pnl > 0 and sell_price / buy_price > 1.03:
+    if pnl > 0 and sell_price / buy_price > 1.04:
         sell_price_str = '%.8f' % sell_price
         bit_z_trade.sell(symbol, sell_price_str, amount_str)
         buy_price_str = '%.8f' % buy_price
@@ -134,7 +134,7 @@ def bit_z_buy_all_coin_sell():
     buy_fee = bit_z_settlement.calculate_buy_fee(symbol, buy_price, amount_float)
     sell_fee = all_coin_settlement.calculate_sell_fee(symbol, sell_price, amount_float)
     pnl = calculate_pnl(buy_price, sell_price, amount_float, buy_fee, sell_fee)
-    if pnl > 0 and sell_price / buy_price > 1.03:
+    if pnl > 0 and sell_price / buy_price > 1.04:
         buy_price_str = '%.8f' % buy_price
         bit_z_trade.buy(symbol, buy_price_str, amount_str)
         sell_price_str = '%.8f' % sell_price
@@ -215,8 +215,14 @@ if __name__ == '__main__':
 
     symbol = 'oc_btc'
 
+    ind = 0
     while True:
         try:
+            ind += 1
+            if ind % 100 == 0:
+                print("### ocbtc arb running %d ###" % ind)
+            if ind == 1000:
+                ind = 0
             all_coin_depth = all_coin_market.depth(symbol)
             all_coin_asks = all_coin_depth['asks']
             all_coin_bids = all_coin_depth['bids']
