@@ -24,7 +24,7 @@ def build_all_coin_sign(params, secret_key):
 
 def http_get(url, verify=True):
     requests.packages.urllib3.disable_warnings()
-    return requests.get(url, verify=verify).json()
+    return requests.get(url, verify=verify, timeout=10).json()
 
 
 def http_post(url, params, verify=True):
@@ -33,7 +33,7 @@ def http_post(url, params, verify=True):
     }
     temp_params = urllib.parse.urlencode(params)
     requests.packages.urllib3.disable_warnings()
-    r = requests.post(url, temp_params, headers=headers, verify=verify)
+    r = requests.post(url, temp_params, headers=headers, verify=verify, timeout=10)
     return r.json()
 
 
